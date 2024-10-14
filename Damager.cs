@@ -7,6 +7,10 @@
     {
         #region Fields
 
+
+
+
+
         ///<inheritdoc cref="Character.Name"/>
         private string _name = nameof(Damager);
 
