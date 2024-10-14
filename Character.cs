@@ -1,8 +1,4 @@
-﻿
-using System.Diagnostics;
-using System.Net.Http.Headers;
-
-namespace Jeu_de_combat
+﻿namespace Jeu_de_combat
 {
     /// <summary>
     /// Defines a base character.

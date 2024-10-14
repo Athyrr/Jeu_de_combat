@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Jeu_de_combat
+﻿namespace Jeu_de_combat
 {
     class Program()
     {
@@ -89,6 +87,9 @@ namespace Jeu_de_combat
             }
         }
 
+        /// <summary>
+        /// Displays a menu which set the game mode.
+        /// </summary>
         private static void Menu()
         {
             Console.WriteLine("          | Game mode selection |");
@@ -108,6 +109,11 @@ namespace Jeu_de_combat
         }
 
 
+        /// <summary>
+        /// Allows a player to select a character.
+        /// </summary>
+        /// <param name="wantIA"></param>
+        /// <returns>Returns the index of the selected character archetype.</returns>
         private static Character PlayerSelection(bool wantIA)
         {
             int choice = 0;
