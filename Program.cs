@@ -37,6 +37,11 @@
         /// </summary>
         private static bool _wantIA = false;
 
+        /// <summary>
+        /// The difficulty of the game
+        /// </summary>
+        private static int difficulty;
+
         public static void Main(string[] args)
         {
 
@@ -93,18 +98,11 @@
         private static void Menu()
         {
             Console.WriteLine("          | Game mode selection |");
-            Console.WriteLine();
-            Console.WriteLine("1: Player vs IA | 2: IA vs IA");
 
             _wantIA = false;
             int index = 0;
-
-            while (!int.TryParse(Console.ReadLine(), out index) || index < 1 && index > 2)
-            {
-                Console.WriteLine("Invalid input");
-                Console.WriteLine("1: Player vs IA | 2: IA vs IA");
-            }
-
+            string question = "\n1: Player vs IA | 2: IA vs IA";
+            index = AskForInput(question, 1, 2);
             _wantIA = index == 1 ? false : true;
         }
 
@@ -119,16 +117,11 @@
             int choice = 0;
             if (!wantIA)
             {
-                Console.WriteLine("Player selection : ");
-                Console.WriteLine("0: Random | 1: Damager | 2: Healer | 3: Tank");
-                int.TryParse(Console.ReadLine(), out choice);
+                string question = "\nPlayer selection :\n0: Random | 1: Damager | 2: Healer | 3: Tank";
+                choice = AskForInput(question, 0, 3);
 
-                while (choice < 1 && choice > 3)
-                {
-                    Console.WriteLine("Invalid input");
-                    Console.WriteLine("0: Random | 1: Damager | 2: Healer | 3: Tank");
-                    int.TryParse(Console.ReadLine(), out choice);
-                }
+                question = "\nDifficulty:\n1: easy | 2: medium | 3: hard";
+                difficulty = AskForInput(question, 1, 3);
 
                 Console.WriteLine();
             }
@@ -193,17 +186,14 @@
 
             if (!source.IsIA)
             {
-                Console.WriteLine("@todo catch error");
-                Console.WriteLine($"(player 1) {source.Name} : What would you like to do ?");
-                Console.WriteLine("1: attack | 2: defend | 3: special attack");
-                int.TryParse(Console.ReadLine(), out choice);
+                string question = $"(player 1) {source.Name} : What would you like to do ?\n1: attack | 2: defend | 3: special attack";
+                choice = AskForInput(question, 1,3);
             }
             else
             {
                 Console.WriteLine("(AI) Je reflechis");
 
-                Random rand = new Random();
-                choice = rand.Next(1, 4);
+                choice = Behaviour(source);
 
                 Thread.Sleep(500);
             }
@@ -261,7 +251,7 @@
         {
             int output = 0;
             Console.WriteLine(question);
-            while (!int.TryParse(Console.ReadLine(), out output) || output <= max && output >= min)
+            while (!int.TryParse(Console.ReadLine(), out output) || output > max || output < min)
             {
                 Console.WriteLine("Invalid input");
                 Console.WriteLine(question);
@@ -359,6 +349,91 @@
                 if (EndGame(_player1, _player2))
                     return;
             }
+        }
+
+        /// <summary>
+        /// return an int that represent the class of the character
+        /// </summary>
+        public static int CharacterType(Character source)
+        {
+            if (source is Damager)
+                return 1;
+            else if (source is Healer)
+                return 2;
+            else return 3;
+        }
+
+        /// <summary>
+        /// IA behaviour depending on current diffculty
+        /// </summary>
+        public static int Behaviour(Character source)
+        {
+            Random rand = new Random();
+            bool followBehaviour;
+
+            switch(difficulty)
+            {
+                case 2:
+                    followBehaviour = !(rand.Next(0, 2) == 0); // 1 chance sur 2
+                    break;
+
+                case 3:
+                    followBehaviour = !(rand.Next(0, 5) == 0); // 4 chances sur 5
+                    break;
+                default:
+                    followBehaviour = false;
+                    break;
+            }
+
+            int choice = rand.Next(1, 4);
+            if (!followBehaviour || difficulty == 1)
+                return choice;
+
+            switch (CharacterType(source))
+            {
+                case 1:
+                    if (source.Health > source.MaxHealth / 2)
+                    {
+                        choice = 1;
+                    }
+                    else if (source.Health <= 2)
+                    {
+                        choice = 2;
+                    }
+                    else
+                    {
+                        rand = new Random();
+                        choice = rand.Next(0, 2);
+                    }
+                    break;
+
+                case 2:
+                    if (source.Health <= source.MaxHealth - 2)
+                    {
+                        choice = 3;
+                    }
+                    else
+                    {
+                        choice = 1;
+                    }
+                    break;
+
+                case 3:
+                    if (source.Health > source.MaxHealth / 2)
+                    {
+                        choice = 3;
+                    }
+                    else if (source.Health <= 2)
+                    {
+                        choice = 2;
+                    }
+                    else
+                    {
+                        choice = 1;
+                    }
+                    break;
+            }
+            return choice;
         }
     }
 }
