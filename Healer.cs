@@ -19,12 +19,26 @@
         ///<inheritdoc cref="Character.MaxHealth"/>
         private int _maxHealth = 4;
 
+        ///<inheritdoc cref="Character.SpriteLeft"/>
+        private string _spriteLeft = "   A @ \n  /|-| \n   | | \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteRight"/>
+        private string _spriteRight = " @ A   \n |-|\\  \n | |   \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteColor"/>
+        private ConsoleColor _spriteColor = ConsoleColor.DarkMagenta;
+
+        /// <summary>
+        /// Bullet's Sprite
+        /// </summary>
+        private string _bulletSprite = "o";
+
         #endregion
 
         ///<inheritdoc cref="Healer"/>
         public Healer()
         {
-            InitStats();
+            InitCharacter();
         }
 
         #region Public API
@@ -32,11 +46,15 @@
         ///<inheritdoc cref="Character.IsAlive"/>
         public new bool IsAlive => _health > 0 ? true : false;
 
-
         ///<summary>
         /// <inheritdoc cref=" Character.SpecialAttack"/>
         ///Heals 2 point of health.
         ///</summary>
+        ///
+     
+        ///<inheritdoc cref="_bulletSprite"/>
+        public string BulletSprite => _bulletSprite;
+
         public override void SpecialAttack(Character target)
         {
             Health = Math.Min(Health + 2, MaxHealth);
@@ -47,15 +65,16 @@
             Console.WriteLine($"{playerIndexString} Health : " + Health);
         }
 
-        ///<inheritdoc cref="Character.InitStats"/>
-        protected override void InitStats()
+        ///<inheritdoc cref="Character.InitCharacter"/>
+        protected override void InitCharacter()
         {
-            CharacterClass = CharacterClasses.Healer;
-
             Name = _name;
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+            SpriteLeft = _spriteLeft;
+            SpriteRight = _spriteRight;
+            SpriteColor = _spriteColor;
         }
 
         #endregion

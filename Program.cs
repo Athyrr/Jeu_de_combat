@@ -3,7 +3,7 @@
     internal class Program()
     {
         ///<inheritdoc cref="GameDisplay"/>
-        private static GameDisplay _displayModule = new GameDisplay();
+        public GameDisplay _displayModule = new GameDisplay();
 
         /// <summary>
         /// Tracks <see cref="AttackProcess"/> datas. 

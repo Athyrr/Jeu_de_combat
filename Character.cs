@@ -88,13 +88,14 @@
 
         ///<inheritdoc cref="_spriteLeft"/>
 
-        public string SpriteLeft => _spriteLeft; 
+        public string SpriteLeft { get => _spriteLeft; protected set => _spriteLeft = value; }
         ///<inheritdoc cref="_spriteRight"/>
 
-        public string SpriteRight => _spriteRight;
+        public string SpriteRight { get => _spriteRight; protected set => _spriteRight = value; }
+
 
         ///<inheritdoc cref="_spriteColor"/>
-        public ConsoleColor SpriteColor => _spriteColor;
+        public ConsoleColor SpriteColor { get => _spriteColor; protected set => _spriteColor = value; }
 
 
         /// <summary>
@@ -141,7 +142,7 @@
         /// <summary>
         /// Initializes character stats.
         /// </summary>
-        protected abstract void InitStats();
+        protected abstract void InitCharacter();
 
         public virtual void ResetEffects()
         {
