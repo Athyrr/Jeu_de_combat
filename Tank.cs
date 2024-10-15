@@ -63,15 +63,6 @@
             Attack(target, Strength + 1);
         }
 
-        ///<inheritdoc cref="Character.InitStats"/>
-        protected override void InitStats()
-        {
-            Name = _name;
-            MaxHealth = _maxHealth;
-            Health = _maxHealth;
-            Strength = _strength;
-        }
-
         ///<inheritdoc cref="Character.ResetEffects"/>
         public override void ResetEffects()
         {
@@ -81,5 +72,22 @@
         }
 
         #endregion
+
+        ///<inheritdoc cref="Character.InitStats"/>
+        protected override void InitStats()
+        {
+            CharacterClass = CharacterClasses.Tank;
+
+            Name = _name;
+            MaxHealth = _maxHealth;
+            Health = _maxHealth;
+            Strength = _strength;
+        }
+
+        #region Protected API
+
+
+        #endregion
+
     }
 }

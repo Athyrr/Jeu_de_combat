@@ -93,6 +93,8 @@
         ///<inheritdoc cref="Character.InitStats"/>
         protected override void InitStats()
         {
+            CharacterClass = CharacterClasses.Damager;
+
             Name = _name;
             MaxHealth = _maxHealth;
             Health = _maxHealth;

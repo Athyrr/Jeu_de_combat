@@ -6,7 +6,8 @@
     public enum GameState
     {
         None,
-        Menu,
+        Intro,
+        GameModeSelection,
         PlayerSelection,
         Game
     }

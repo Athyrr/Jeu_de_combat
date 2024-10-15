@@ -1,7 +1,10 @@
 ﻿namespace Jeu_de_combat
 {
-    class Program()
+    internal class Program()
     {
+        ///<inheritdoc cref="GameDisplay"/>
+        private static GameDisplay _displayModule = new GameDisplay();
+
         /// <summary>
         /// Tracks <see cref="AttackProcess"/> datas. 
         /// </summary>
@@ -15,12 +18,12 @@
         /// <summary>
         /// The player 1.
         /// </summary>
-        static Character _player1 = null;
+        private static Character _player1 = null;
 
         /// <summary>
         /// The player 2.
         /// </summary>
-        static Character _player2 = null;
+        private static Character _player2 = null;
 
         /// <summary>
         /// Is the game running ?
@@ -45,15 +48,28 @@
         public static void Main(string[] args)
         {
 
-            GameState state = GameState.Menu;
+            GameDisplay gameDisplay = new GameDisplay();
+
+            GameState state = GameState.GameModeSelection;
             _isRunning = true;
+
             while (_isRunning)
             {
                 switch (state)
                 {
-                    case GameState.Menu:
+                    case GameState.Intro:
+                        state = GameState.GameModeSelection;
 
-                        Menu();
+                        //OpenAnim
+                        //ButSelect
+
+                        //Depends on but selection
+                        state = GameState.PlayerSelection;
+                        break;
+
+                    case GameState.GameModeSelection:
+
+                        GameModeSelection();
 
                         state = GameState.PlayerSelection;
                         break;
@@ -62,6 +78,8 @@
 
                         Console.WriteLine();
 
+                        //if(!_wantIA)
+                        //    CharacterSekectionDIsplay
 
                         _player1 = PlayerSelection(_wantIA);
                         _player1.IsIA = _wantIA;
@@ -95,8 +113,12 @@
         /// <summary>
         /// Displays a menu which set the game mode.
         /// </summary>
-        private static void Menu()
+        private static void GameModeSelection()
         {
+            //GameModeSelectionDisplay();
+
+
+
             Console.WriteLine("          | Game mode selection |");
 
             _wantIA = false;
@@ -104,6 +126,12 @@
             string question = "\n1: Player vs IA | 2: IA vs IA";
             index = AskForInput(question, 1, 2);
             _wantIA = index == 1 ? false : true;
+
+            //string scene = ButSelect();
+            //ButClick(scene);
+
+            //_wantIA == scene == "Ai vs AI" ? true : false;
+
         }
 
 
@@ -114,6 +142,8 @@
         /// <returns>Returns the index of the selected character archetype.</returns>
         private static Character PlayerSelection(bool wantIA)
         {
+            //Add string class parameter.
+
             int choice = 0;
             if (!wantIA)
             {
@@ -145,6 +175,9 @@
                 case 3:
                     Tank tank = new();
                     return tank;
+
+                //Case 4 : other character
+
                 default:
                     Console.WriteLine("Failed select player! Player input is invalid.");
                     return null;
@@ -159,6 +192,8 @@
             Console.WriteLine();
             Console.WriteLine("|| FIGHTTTTTTTTTTT ||");
             Console.WriteLine();
+
+            //FightDisplay(Charatcter player1, CHaracter player2)
 
             while (!_stopFighting)
             {
@@ -187,13 +222,12 @@
             if (!source.IsIA)
             {
                 string question = $"(player 1) {source.Name} : What would you like to do ?\n1: attack | 2: defend | 3: special attack";
-                choice = AskForInput(question, 1,3);
+                choice = AskForInput(question, 1, 3);
             }
             else
             {
                 Console.WriteLine("(AI) Je reflechis");
-
-                choice = Behaviour(source);
+                choice = AIBehavior(source);
 
                 Thread.Sleep(500);
             }
@@ -352,8 +386,10 @@
         }
 
         /// <summary>
-        /// return an int that represent the class of the character
+        /// 
         /// </summary>
+        /// <param name="source"></param>
+        /// <returns>Returns an int that represent the class of the character</returns>
         public static int CharacterType(Character source)
         {
             if (source is Damager)
@@ -366,12 +402,12 @@
         /// <summary>
         /// IA behaviour depending on current diffculty
         /// </summary>
-        public static int Behaviour(Character source)
+        public static int AIBehavior(Character source)
         {
             Random rand = new Random();
             bool followBehaviour;
 
-            switch(difficulty)
+            switch (difficulty)
             {
                 case 2:
                     followBehaviour = !(rand.Next(0, 2) == 0); // 1 chance sur 2
@@ -380,6 +416,7 @@
                 case 3:
                     followBehaviour = !(rand.Next(0, 5) == 0); // 4 chances sur 5
                     break;
+
                 default:
                     followBehaviour = false;
                     break;
@@ -389,48 +426,43 @@
             if (!followBehaviour || difficulty == 1)
                 return choice;
 
-            switch (CharacterType(source))
+
+            switch (source.CharacterClass)
             {
-                case 1:
+                case CharacterClasses.Damager:
                     if (source.Health > source.MaxHealth / 2)
-                    {
                         choice = 1;
-                    }
+
                     else if (source.Health <= 2)
-                    {
                         choice = 2;
-                    }
+
                     else
                     {
                         rand = new Random();
                         choice = rand.Next(0, 2);
                     }
+
                     break;
 
-                case 2:
+                case CharacterClasses.Healer:
                     if (source.Health <= source.MaxHealth - 2)
-                    {
                         choice = 3;
-                    }
+
                     else
-                    {
                         choice = 1;
-                    }
+
                     break;
 
-                case 3:
+                case CharacterClasses.Tank:
                     if (source.Health > source.MaxHealth / 2)
-                    {
                         choice = 3;
-                    }
+
                     else if (source.Health <= 2)
-                    {
                         choice = 2;
-                    }
+
                     else
-                    {
                         choice = 1;
-                    }
+
                     break;
             }
             return choice;

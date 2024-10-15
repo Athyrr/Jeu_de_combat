@@ -32,6 +32,7 @@
         ///<inheritdoc cref="Character.IsAlive"/>
         public new bool IsAlive => _health > 0 ? true : false;
 
+
         ///<summary>
         /// <inheritdoc cref=" Character.SpecialAttack"/>
         ///Heals 2 point of health.
@@ -49,6 +50,8 @@
         ///<inheritdoc cref="Character.InitStats"/>
         protected override void InitStats()
         {
+            CharacterClass = CharacterClasses.Healer;
+
             Name = _name;
             MaxHealth = _maxHealth;
             Health = _maxHealth;
