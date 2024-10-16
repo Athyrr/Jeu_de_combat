@@ -30,7 +30,7 @@
         private int _damagesTaken = 0;
 
         /// <inheritdoc cref="Character.SpriteLeft"/>
-        private static string _spriteLeft = "   O  _\n  /|-/ \n   |   \n  / \\  ";
+        private static string _spriteLeft = "   O  _\n  /|-/ \n   |   \n  / \\  "; 
 
         /// <inheritdoc cref="Character.SpriteRight"/>
         private static string _spriteRight = "_  O   \n \\-|\\ \n   |   \n  / \\  ";

@@ -150,7 +150,6 @@ namespace Jeu_de_combat
         public static void DisplayFight(Character playerLeft, Character playerRight)
         {
             FloorAnim();
-   
 
             for (int i = 10; i >= 0; i--)
             {

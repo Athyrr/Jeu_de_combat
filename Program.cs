@@ -49,7 +49,7 @@
         {
             GameDisplay.Init();
 
-            GameState state = GameState.PlayerSelection;
+            GameState state = GameState.Intro;
 
             _isRunning = true;
 

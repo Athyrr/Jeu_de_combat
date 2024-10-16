@@ -42,17 +42,17 @@
         /// <summary>
         /// The character left sprite.
         /// </summary>
-        private static string _spriteLeft = "";
+        private string _spriteLeft = "";
 
         /// <summary>
         /// The character right sprite.
         /// </summary>
-        private static string _spriteRight = "";
+        private string _spriteRight = "";
 
         /// <summary>
         /// The character sprite color.
         /// </summary>
-        private static ConsoleColor _spriteColor = ConsoleColor.White;
+        private ConsoleColor _spriteColor = ConsoleColor.White;
 
         #endregion
 
@@ -86,13 +86,13 @@
 
 
         ///<inheritdoc cref="_spriteLeft"/>
-        public static string SpriteLeft => _spriteLeft;
+        public static string SpriteLeft = "";
 
         ///<inheritdoc cref="_spriteRight"/>
-        public static string SpriteRight => _spriteRight;
+        public static string SpriteRight = "";
 
         ///<inheritdoc cref="_spriteColor"/>
-        public static ConsoleColor SpriteColor => _spriteColor;
+        public static ConsoleColor SpriteColor = ConsoleColor.White;
 
 
         /// <summary>
