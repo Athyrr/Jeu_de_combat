@@ -33,6 +33,25 @@
         /// </summary>
         private int _damagesTaken = 0;
 
+        /// <inheritdoc cref="Character.SpriteLeft"/>
+        private static string _spriteLeft = "   O  _\n  /|-/ \n   |   \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteRight"/>
+        private string _spriteRight = "_  O   \n \\-|\\ \n   |   \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteColor"/>
+        private ConsoleColor _spriteColor = ConsoleColor.DarkYellow;
+
+        /// <summary>
+        /// Bullet's Sprite
+        /// </summary>
+        private string _bulletSprite = "__";
+
+        /// <summary>
+        /// SpriteColor of special attack
+        /// </summary>
+        private ConsoleColor _colorSpecial = ConsoleColor.Red;
+
         #endregion
 
 
@@ -41,7 +60,7 @@
         ///<inheritdoc cref="Damager"/>
         public Damager()
         {
-            InitStats();
+            InitCharacter();
         }
 
         #endregion
@@ -58,6 +77,10 @@
         ///<inheritdoc cref="_specialEffectEnabled"/>
         public bool SpecialEffectEnabled => _specialEffectEnabled;
 
+        ///<inheritdoc cref="_bulletSprite"/>
+        public string BulletSprite => _bulletSprite;
+
+        public ConsoleColor ColorSpecial => _colorSpecial;
 
         ///<inheritdoc cref="Character.TakeDamage(Character, int)"/>
         protected override void TakeDamage(Character source, int damageAmount)
@@ -90,13 +113,18 @@
 
         #region Protected API
 
-        ///<inheritdoc cref="Character.InitStats"/>
-        protected override void InitStats()
+        ///<inheritdoc cref="Character.InitCharacter"/>
+        protected override void InitCharacter()
         {
+            CharacterClass = CharacterClasses.Damager;
+
             Name = _name;
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+            SpriteLeft = _spriteLeft;
+            SpriteRight = _spriteRight;
+            SpriteColor = _spriteColor;
         }
 
         #endregion

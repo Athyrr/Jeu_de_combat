@@ -24,12 +24,29 @@
         /// </summary>
         private bool _specialEffectEnabled = false;
 
+        ///<inheritdoc cref="Character.SpriteLeft"/>
+        private string _spriteLeft = "   O | \n 0-|-| \n   |   \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteRight"/>
+        private string _spriteRight = " | O   \n |-|-0 \n   |   \n  / \\  ";
+
+        /// <inheritdoc cref="Character.SpriteColor"/>
+        private ConsoleColor _spriteColor = ConsoleColor.DarkBlue;
+        private ConsoleColor _spriteColorNeutral = ConsoleColor.DarkBlue;
+        private ConsoleColor _spriteColorSpecial = ConsoleColor.Red;
+
+        private string _spriteLeftBody = "   O | \n 0-|-| \n   |   ";
+        private string _spriteRightBody = " | O   \n |-|-0 \n   |   ";
+        private string _spriteLeftAttack = "   O  /\n 0-|\\/ \n   |   ";
+        private string _spriteRightAttack = "\\  O   \n \\/|-0 \n   |   ";
+        private string[] _spriteLegs = ["\n  / \\  ", "\n   |\\  ", "\n  /|   ", "\n  / \\  "];
+
         #endregion
 
         /// <inheritdoc cref="Tank"/>
         public Tank()
         {
-            InitStats();
+            InitCharacter();
         }
 
         #region Public API
@@ -63,8 +80,8 @@
             Attack(target, Strength + 1);
         }
 
-        ///<inheritdoc cref="Character.InitStats"/>
-        protected override void InitStats()
+        ///<inheritdoc cref="Character.InitCharacter"/>
+        protected override void InitCharacter()
         {
             Name = _name;
             MaxHealth = _maxHealth;

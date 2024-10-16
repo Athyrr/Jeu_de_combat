@@ -37,6 +37,23 @@
         /// </summary>
         private bool _isIA = false;
 
+        //Sprites
+
+        /// <summary>
+        /// The character left sprite.
+        /// </summary>
+        private string _spriteLeft = "";
+
+        /// <summary>
+        /// The character right sprite.
+        /// </summary>
+        private string _spriteRight = "";
+
+        /// <summary>
+        /// The character sprite color.
+        /// </summary>
+        private ConsoleColor _spriteColor = ConsoleColor.White;
+
         #endregion
 
 
@@ -54,9 +71,31 @@
         ///<inheritdoc cref="_health"/>
         public int MaxHealth { get => _maxHealth; protected set => _maxHealth = value; }
 
+        /// <summary>
+        /// Is the character alive ?
+        /// </summary>
         public bool IsAlive => _health > 0 ? true : false;
 
+        ///<inheritdoc cref="_isIA"/>
         public bool IsIA { get => _isIA; set => _isIA = value; }
+
+        /// <summary>
+        /// The class of the character
+        /// </summary>
+        public CharacterClasses CharacterClass = CharacterClasses.None;
+
+        //Sprites Properties
+
+        ///<inheritdoc cref="_spriteLeft"/>
+
+        public string SpriteLeft { get => _spriteLeft; protected set => _spriteLeft = value; }
+        ///<inheritdoc cref="_spriteRight"/>
+
+        public string SpriteRight { get => _spriteRight; protected set => _spriteRight = value; }
+
+
+        ///<inheritdoc cref="_spriteColor"/>
+        public ConsoleColor SpriteColor { get => _spriteColor; protected set => _spriteColor = value; }
 
 
         /// <summary>
@@ -103,7 +142,7 @@
         /// <summary>
         /// Initializes character stats.
         /// </summary>
-        protected abstract void InitStats();
+        protected abstract void InitCharacter();
 
         public virtual void ResetEffects()
         {
