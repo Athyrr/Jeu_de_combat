@@ -408,20 +408,23 @@
         public static int AIBehavior(Character source)
         {
             Random rand = new Random();
-            bool followBehaviour;
+            bool followBehaviour = true;
 
             switch (difficulty)
             {
+                case 1:
+                    followBehaviour = false;
+                    break;
                 case 2:
-                    followBehaviour = !(rand.Next(0, 2) == 0); // 1 chance sur 2
+                    followBehaviour = rand.Next(0, 2) == 0; // 1 chance sur 2
                     break;
 
                 case 3:
-                    followBehaviour = !(rand.Next(0, 5) == 0); // 4 chances sur 5
+                    followBehaviour = !(rand.Next(0, 6) == 0); // 5 chances sur 6
                     break;
 
                 default:
-                    followBehaviour = false;
+                    Console.WriteLine("Difficulty is not in valid int");
                     break;
             }
 
