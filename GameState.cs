@@ -9,6 +9,7 @@
         Intro,
         GameModeSelection,
         PlayerSelection,
-        Game
+        Game,
+        Credit
     }
 }

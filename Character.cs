@@ -42,17 +42,17 @@
         /// <summary>
         /// The character left sprite.
         /// </summary>
-        private string _spriteLeft = "";
+        private static string _spriteLeft = "";
 
         /// <summary>
         /// The character right sprite.
         /// </summary>
-        private string _spriteRight = "";
+        private static string _spriteRight = "";
 
         /// <summary>
         /// The character sprite color.
         /// </summary>
-        private ConsoleColor _spriteColor = ConsoleColor.White;
+        private static ConsoleColor _spriteColor = ConsoleColor.White;
 
         #endregion
 
@@ -84,18 +84,31 @@
         /// </summary>
         public CharacterClasses CharacterClass = CharacterClasses.None;
 
-        //Sprites Properties
 
         ///<inheritdoc cref="_spriteLeft"/>
+        public static string SpriteLeft => _spriteLeft;
 
-        public string SpriteLeft { get => _spriteLeft; protected set => _spriteLeft = value; }
         ///<inheritdoc cref="_spriteRight"/>
-
-        public string SpriteRight { get => _spriteRight; protected set => _spriteRight = value; }
-
+        public static string SpriteRight => _spriteRight;
 
         ///<inheritdoc cref="_spriteColor"/>
-        public ConsoleColor SpriteColor { get => _spriteColor; protected set => _spriteColor = value; }
+        public static ConsoleColor SpriteColor => _spriteColor;
+
+
+        /// <summary>
+        /// Non-static version of <see cref="SpriteLeft"/>
+        /// </summary>
+        public string SpriteLeftInstance { get => _spriteLeft; protected set => _spriteLeft = value; }
+
+        /// <summary>
+        /// None-static version of <see cref="SpriteLeft"/>
+        /// </summary>
+        public string SpriteRightInstance { get => _spriteRight; protected set => _spriteRight = value; }
+
+        /// <summary>
+        /// None-static version of <see cref="SpriteColor"/>
+        /// </summary>
+        public ConsoleColor SpriteColorInstance { get => _spriteColor; protected set => _spriteColor = value; }
 
 
         /// <summary>
@@ -134,6 +147,9 @@
         /// </summary>
         public abstract void SpecialAttack(Character target);
 
+        /// <summary>
+        /// Defends the character, and avoid taken damages.
+        /// </summary>
         public void Defend()
         {
             _isDefending = true;
@@ -144,15 +160,14 @@
         /// </summary>
         protected abstract void InitCharacter();
 
+        /// <summary>
+        /// Resets all current active effects.
+        /// </summary>
         public virtual void ResetEffects()
         {
             _isDefending = false;
         }
 
         #endregion
-
-
-
-
     }
 }

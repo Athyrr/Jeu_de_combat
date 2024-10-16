@@ -25,21 +25,24 @@
         private bool _specialEffectEnabled = false;
 
         ///<inheritdoc cref="Character.SpriteLeft"/>
-        private string _spriteLeft = "   O | \n 0-|-| \n   |   \n  / \\  ";
+        private static string _spriteLeft = "   O | \n 0-|-| \n   |   \n  / \\  ";
 
         /// <inheritdoc cref="Character.SpriteRight"/>
-        private string _spriteRight = " | O   \n |-|-0 \n   |   \n  / \\  ";
+        private static string _spriteRight = " | O   \n |-|-0 \n   |   \n  / \\  ";
 
         /// <inheritdoc cref="Character.SpriteColor"/>
-        private ConsoleColor _spriteColor = ConsoleColor.DarkBlue;
-        private ConsoleColor _spriteColorNeutral = ConsoleColor.DarkBlue;
-        private ConsoleColor _spriteColorSpecial = ConsoleColor.Red;
+        private static ConsoleColor _spriteColor = ConsoleColor.DarkBlue;
 
-        private string _spriteLeftBody = "   O | \n 0-|-| \n   |   ";
-        private string _spriteRightBody = " | O   \n |-|-0 \n   |   ";
-        private string _spriteLeftAttack = "   O  /\n 0-|\\/ \n   |   ";
-        private string _spriteRightAttack = "\\  O   \n \\/|-0 \n   |   ";
-        private string[] _spriteLegs = ["\n  / \\  ", "\n   |\\  ", "\n  /|   ", "\n  / \\  "];
+        /// <summary>
+        /// SpriteColor of special attack
+        /// </summary>
+        private static ConsoleColor _spriteColorSpecial = ConsoleColor.Red;
+
+        private static string _spriteLeftBody = "   O | \n 0-|-| \n   |   ";
+        private static string _spriteRightBody = " | O   \n |-|-0 \n   |   ";
+        private static string _spriteLeftAttack = "   O  /\n 0-|\\/ \n   |   ";
+        private static string _spriteRightAttack = "\\  O   \n \\/|-0 \n   |   ";
+        private static string[] _spriteLegs = ["\n  / \\  ", "\n   |\\  ", "\n  /|   ", "\n  / \\  "];
 
         #endregion
 
@@ -51,11 +54,26 @@
 
         #region Public API
 
-        ///<inheritdoc cref="Character.IsAlive"/>
-        public new bool IsAlive => _health > 0 ? true : false;
+        /////<inheritdoc cref="Character.IsAlive"/>
+        //public new bool IsAlive => _health > 0 ? true : false;
 
         ///<inheritdoc cref=" _specialEffectEnabled"/>
         public bool SpecialEffectEnabled => _specialEffectEnabled;
+
+        public new static string SpriteLeft => _spriteLeft;
+        public new static string SpriteRight => _spriteRight;
+        public static string SpriteRightBody => _spriteRightBody;
+        public static string SpriteLeftBody => _spriteLeftBody;
+        public static string SpriteLeftAttack => _spriteLeftAttack;
+        public static string SpriteRightAttack => _spriteRightAttack;
+        public static string[] SpriteLegs => _spriteLegs;
+
+
+        ///<inheritdoc cref="_spriteColorNeutral"/>
+        public new static ConsoleColor SpriteColor => _spriteColor;
+
+        ///<inheritdoc cref="_spriteColorSpecial"/>
+        public static ConsoleColor SpriteColorSpecial => _spriteColorSpecial;
 
         #endregion
 
@@ -83,10 +101,16 @@
         ///<inheritdoc cref="Character.InitCharacter"/>
         protected override void InitCharacter()
         {
+            CharacterClass = CharacterClasses.Damager;
+
             Name = _name;
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+
+            SpriteColorInstance = _spriteColor;
+            SpriteLeftInstance = _spriteLeft;
+            SpriteRightInstance = _spriteRight;
         }
 
         ///<inheritdoc cref="Character.ResetEffects"/>

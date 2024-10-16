@@ -7,10 +7,6 @@
     {
         #region Fields
 
-
-
-
-
         ///<inheritdoc cref="Character.Name"/>
         private string _name = nameof(Damager);
 
@@ -37,20 +33,20 @@
         private static string _spriteLeft = "   O  _\n  /|-/ \n   |   \n  / \\  ";
 
         /// <inheritdoc cref="Character.SpriteRight"/>
-        private string _spriteRight = "_  O   \n \\-|\\ \n   |   \n  / \\  ";
+        private static string _spriteRight = "_  O   \n \\-|\\ \n   |   \n  / \\  ";
 
         /// <inheritdoc cref="Character.SpriteColor"/>
-        private ConsoleColor _spriteColor = ConsoleColor.DarkYellow;
+        private static ConsoleColor _spriteColor = ConsoleColor.DarkYellow;
 
         /// <summary>
         /// Bullet's Sprite
         /// </summary>
-        private string _bulletSprite = "__";
+        private static string _bulletSprite = "__";
 
         /// <summary>
         /// SpriteColor of special attack
         /// </summary>
-        private ConsoleColor _colorSpecial = ConsoleColor.Red;
+        private static ConsoleColor _spriteColorSpecial = ConsoleColor.Red;
 
         #endregion
 
@@ -68,8 +64,8 @@
 
         #region Public API
 
-        ///<inheritdoc cref="Character.IsAlive"/>
-        public new bool IsAlive => Health > 0 ? true : false;
+        /////<inheritdoc cref="Character.IsAlive"/>
+        //public new bool IsAlive => Health > 0 ? true : false;
 
         ///<inheritdoc cref=_damagesTaken"/>
         public int DamagesTaken => _damagesTaken;
@@ -77,10 +73,22 @@
         ///<inheritdoc cref="_specialEffectEnabled"/>
         public bool SpecialEffectEnabled => _specialEffectEnabled;
 
-        ///<inheritdoc cref="_bulletSprite"/>
-        public string BulletSprite => _bulletSprite;
 
-        public ConsoleColor ColorSpecial => _colorSpecial;
+        ///<inheritdoc cref="_bulletSprite"/>
+        public static string BulletSprite => _bulletSprite;
+
+        ///<inheritdoc cref="SpriteLeft"/>
+        public new static string SpriteLeft => _spriteLeft;
+
+        ///<inheritdoc cref="_spriteRight"/>
+        public new static string SpriteRight => _spriteRight;
+
+        ///<inheritdoc cref="_spriteColor"/>
+        public new static ConsoleColor SpriteColor => _spriteColor;
+
+        ///<inheritdoc cref="_spriteColorSpecial"/>
+        public static ConsoleColor ColorSpecial => _spriteColorSpecial;
+
 
         ///<inheritdoc cref="Character.TakeDamage(Character, int)"/>
         protected override void TakeDamage(Character source, int damageAmount)
@@ -122,9 +130,11 @@
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
-            SpriteLeft = _spriteLeft;
-            SpriteRight = _spriteRight;
-            SpriteColor = _spriteColor;
+
+            SpriteLeftInstance = _spriteLeft;
+
+            SpriteRightInstance = _spriteRight;
+            SpriteColorInstance = _spriteColor;
         }
 
         #endregion

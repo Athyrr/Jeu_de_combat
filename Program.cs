@@ -38,7 +38,7 @@
         /// <summary>
         /// Makes the player1 an AI.
         /// </summary>
-        private static bool _wantIA = false;
+        private static bool _wantAI = false;
 
         /// <summary>
         /// The difficulty of the game
@@ -47,10 +47,10 @@
 
         public static void Main(string[] args)
         {
+            GameDisplay.Init();
 
-            GameDisplay gameDisplay = new GameDisplay();
+            GameState state = GameState.PlayerSelection;
 
-            GameState state = GameState.GameModeSelection;
             _isRunning = true;
 
             while (_isRunning)
@@ -58,18 +58,34 @@
                 switch (state)
                 {
                     case GameState.Intro:
-                        state = GameState.GameModeSelection;
 
-                        //OpenAnim
-                        //ButSelect
+                        string menu = GameDisplay.DisplayMenu();
 
-                        //Depends on but selection
-                        state = GameState.PlayerSelection;
+                        switch (menu)
+                        {
+                            case "Quit":
+                                GameDisplay.Fade(true, false);
+                                Environment.Exit(0);
+                                break;
+
+                            case "Play":
+                                state = GameState.GameModeSelection;
+                                break;
+
+                            case "Credits":
+                                state = GameState.Credit;
+                                break;
+
+                            default:
+                                Console.WriteLine("Error menu seletion !");
+                                break;
+                        }
+
                         break;
 
                     case GameState.GameModeSelection:
-
-                        GameModeSelection();
+                        string mode = GameDisplay.DisplayGameModeSelection();
+                        _wantAI = GameModeSelection(mode);
 
                         state = GameState.PlayerSelection;
                         break;
@@ -77,27 +93,36 @@
                     case GameState.PlayerSelection:
 
                         Console.WriteLine();
+                        string characterString = "";
 
-                        //if(!_wantIA)
-                        //    CharacterSekectionDIsplay
+                        if (!_wantAI)
+                            characterString = GameDisplay.DisplayCharacterSelection();
 
-                        _player1 = PlayerSelection(_wantIA);
-                        _player1.IsIA = _wantIA;
+                        _player1 = PlayerSelection(_wantAI, characterString);
+                        _player1.IsIA = _wantAI;
                         Console.WriteLine($"Player 1 picked : {_player1.Name}");
 
-                        if (!_wantIA) _wantIA = true;
+                        if (!_wantAI) _wantAI = true;
 
-                        _player2 = PlayerSelection(_wantIA);
-                        _player2.IsIA = _wantIA;
+                        _player2 = PlayerSelection(_wantAI, characterString);
+                        _player2.IsIA = _wantAI;
                         Console.WriteLine($"Player 2 picked : {_player2.Name}");
 
                         state = GameState.Game;
                         break;
 
                     case GameState.Game:
-
+                        GameDisplay.DisplayFight(_player1, _player2);
                         Game();
                         _isRunning = false;
+
+                        state = GameState.Credit;
+                        break;
+
+                    case GameState.Credit:
+                        GameDisplay.DisplayCredits();
+
+                        state = GameState.Intro;
                         break;
 
                     default:
@@ -113,25 +138,9 @@
         /// <summary>
         /// Displays a menu which set the game mode.
         /// </summary>
-        private static void GameModeSelection()
+        private static bool GameModeSelection(string mode)
         {
-            //GameModeSelectionDisplay();
-
-
-
-            Console.WriteLine("          | Game mode selection |");
-
-            _wantIA = false;
-            int index = 0;
-            string question = "\n1: Player vs IA | 2: IA vs IA";
-            index = AskForInput(question, 1, 2);
-            _wantIA = index == 1 ? false : true;
-
-            //string scene = ButSelect();
-            //ButClick(scene);
-
-            //_wantIA == scene == "Ai vs AI" ? true : false;
-
+            return mode == "AI vs AI" ? true : false;
         }
 
 
@@ -140,41 +149,35 @@
         /// </summary>
         /// <param name="wantIA"></param>
         /// <returns>Returns the index of the selected character archetype.</returns>
-        private static Character PlayerSelection(bool wantIA)
+        private static Character PlayerSelection(bool wantIA, string characterString)
         {
-            //Add string class parameter.
-
-            int choice = 0;
-            if (!wantIA)
+            Dictionary<int, Character> indexCharacters = new Dictionary<int, Character>
             {
-                string question = "\nPlayer selection :\n0: Random | 1: Damager | 2: Healer | 3: Tank";
-                choice = AskForInput(question, 0, 3);
+                { 1, new Damager() },
+                { 2, new Healer() },
+                { 3, new Tank() }
+            };
 
-                question = "\nDifficulty:\n1: easy | 2: medium | 3: hard";
-                difficulty = AskForInput(question, 1, 3);
-
-                Console.WriteLine();
-            }
-
-            if (wantIA || choice == 0)
+            if (wantIA)
             {
                 Random rand = new Random();
-                choice = rand.Next(1, 4);
+                int choice = rand.Next(1, 4);
+
+                return indexCharacters[choice];
             }
 
-
-            switch (choice)
+            switch (characterString)
             {
-                case 1:
-                    Damager damager = new();
-                    return damager;
+                case nameof(Damager):
+                    return new Damager();
 
-                case 2:
-                    Healer healer = new();
-                    return healer;
-                case 3:
-                    Tank tank = new();
-                    return tank;
+
+                case nameof(Healer):
+                    return new Healer();
+
+
+                case nameof(Tank):
+                    return new Tank();
 
                 //Case 4 : other character
 

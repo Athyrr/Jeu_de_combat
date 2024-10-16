@@ -25,6 +25,7 @@
         /// </summary>
         public int DamageAmount;
 
+
         ///<inheritdoc cref="AttackProcess"/>
         public AttackProcess(Character source, Character target, bool isSpecial, int damageAmount = 0)
         {
