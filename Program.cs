@@ -43,11 +43,12 @@
         /// <summary>
         /// The difficulty of the game
         /// </summary>
-        private static int difficulty;
+        private static int difficulty = 2;
 
         public static void Main(string[] args)
         {
             GameDisplay.Init();
+            SoundManager.Init();
 
             GameState state = GameState.Intro;
 
@@ -58,7 +59,7 @@
                 switch (state)
                 {
                     case GameState.Intro:
-
+                        SoundManager.Play("bg_menu.mp3", true);
                         string menu = GameDisplay.DisplayMenu();
 
                         switch (menu)
@@ -115,6 +116,8 @@
                         break;
 
                     case GameState.Game:
+                        SoundManager.Stop("bg_menu.mp3");
+                        SoundManager.Play("bg_fight.mp3", true);
                         GameDisplay.DisplayFight(_player1, _player2);
                         Game();
                         _isRunning = false;
@@ -123,6 +126,7 @@
                         break;
 
                     case GameState.Credit:
+                        SoundManager.Play("credits.mp3", true);
                         GameDisplay.DisplayCredits();
 
                         state = GameState.Intro;
@@ -421,31 +425,14 @@
         public static string AIBehavior(Character source, string[] choices)
         {
             Random rand = new Random();
-            bool followBehaviour = true;
-
-            switch (difficulty)
-            {
-                case 1:
-                    followBehaviour = false;
-                    break;
-                case 2:
-                    followBehaviour = rand.Next(0, 2) == 0; // 1 chance sur 2
-                    break;
-
-                case 3:
-                    followBehaviour = !(rand.Next(0, 6) == 0); // 5 chances sur 6
-                    break;
-
-                default:
-                    Console.WriteLine("Difficulty is not in valid int");
-                    break;
-            }
 
             string choice = choices[rand.Next(0, choices.Count())];
-            //if (!followBehaviour)
-            //    return choices[choice-1];
 
+            //difficulty 1 means random action
+            if (difficulty == 1)
+                return choice;
 
+            //difficulty 2 means decisions based on the health of the character
             switch (source.CharacterClass)
             {
                 case CharacterClasses.Damager:

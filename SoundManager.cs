@@ -32,7 +32,7 @@ namespace Jeu_de_combat
         /// <summary>
         /// Load all sounds in a dictionnary. It must be called at the beginning of the game.
         /// </summary>
-        public static void InitSounds()
+        public static void Init()
         {
             foreach (var file in soundsPath)
             {
@@ -61,6 +61,15 @@ namespace Jeu_de_combat
         public static void Stop(string sound)
         {
             sounds[sound].controls.stop();
+        }
+
+        /// <summary>
+        /// return if the sound is playing or not
+        /// </summary>
+        /// <returns></returns>
+        static bool IsSoundRunning(string sound)
+        {
+            return sounds[sound].playState == WMPPlayState.wmppsPlaying;
         }
     }
 }
