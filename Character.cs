@@ -110,6 +110,11 @@
         ///<inheritdoc cref="_spriteColor"/>
         public static ConsoleColor SpriteColor = ConsoleColor.White;
 
+        /// <summary>
+        /// Player previous action - Adam wallah pardon
+        /// </summary>
+        public string previousChoice = ""; 
+
 
         /// <summary>
         /// Non-static version of <see cref="SpriteLeft"/>
@@ -125,7 +130,6 @@
         /// None-static version of <see cref="SpriteColor"/>
         /// </summary>
         public ConsoleColor SpriteColorInstance { get => _spriteColor; protected set => _spriteColor = value; }
-
 
         /// <summary>
         /// Use a basic attack.
@@ -156,7 +160,7 @@
         /// <summary>
         /// Use character special attack.
         /// </summary>
-        public abstract void SpecialAttack(Character target, bool lookRight);
+        public abstract void SpecialAttack(Character target);
 
         /// <summary>
         /// Defends the character, and avoid taken damages.

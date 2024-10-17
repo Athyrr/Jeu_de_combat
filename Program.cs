@@ -225,23 +225,37 @@
         private static string Choice(Character source, Character target)
         {
             string choice = "";
+            List<string> choices = ["Attack", "Defend", "Special"];
+
+            string question = $"(Player 1) {source.Name} : What would you like to do ?\n\n";
+            List<string> choicesText = new List<string> {
+                $"{question}Attack : Infliges {source.Strength} damages",
+                $"{question}Defend : Prevent from getting damages if the opponent attack",
+                $"{question}{source.SpecialDescription}"
+            };
 
             if (!source.IsIA)
             {
-                string question = $"(Player 1) {source.Name} : What would you like to do ?\n\n";
-                string[] texts =
+                int id = choices.IndexOf(source.previousChoice);
+                if(id>0)
                 {
-                    $"{question}Attack : Infliges {source.Strength} damages",
-                    $"{question}Defend : Prevent from getting damages if the opponent attack",
-                    $"{question}{source.SpecialDescription}"
-                };
+                    choices.RemoveAt(id); 
+                    choicesText.RemoveAt(id);
+                }
 
-                choice = GameDisplay.Selector(["Attack", "Defend", "Special"], texts);
+                choice = GameDisplay.Selector(choices.ToArray(), choicesText.ToArray());
+                if (choice == "Attack")
+                    source.previousChoice = "";
+                else
+                    source.previousChoice = choice;
+
             }
             else
             {
-                choice = AIBehavior(source);
-
+                choices.Remove(source.previousChoice);
+                choice = AIBehavior(source, choices.ToArray());
+                if(choice != "Attack")
+                    source.previousChoice = choice;
                 Thread.Sleep(500);
             }
 
@@ -328,7 +342,7 @@
             {
                 if (process.IsSpecial)
                 {
-                    process.Source.SpecialAttack(process.Target, process.Source.IsLeft);
+                    process.Source.SpecialAttack(process.Target);
                 }
                 else
                 {
@@ -404,11 +418,10 @@
         /// <summary>
         /// IA behaviour depending on current diffculty
         /// </summary>
-        public static string AIBehavior(Character source)
+        public static string AIBehavior(Character source, string[] choices)
         {
             Random rand = new Random();
             bool followBehaviour = true;
-            string[] choices = ["Attack", "Defend", "Special"];
 
             switch (difficulty)
             {
@@ -428,7 +441,7 @@
                     break;
             }
 
-            int choice = rand.Next(1, 4);
+            string choice = choices[rand.Next(0, choices.Count())];
             //if (!followBehaviour)
             //    return choices[choice-1];
 
@@ -436,42 +449,40 @@
             switch (source.CharacterClass)
             {
                 case CharacterClasses.Damager:
-                    if (source.Health > source.MaxHealth / 2)
-                        choice = 1;
-
-                    else if (source.Health <= 2)
-                        choice = 2;
-
-                    else
-                    {
-                        rand = new Random();
-                        choice = rand.Next(0, 2);
-                    }
+                    // Si la vie du Damager est plus grande que 2 et que l'IA peut attaquer, elle le fait
+                    if (source.Health > source.MaxHealth / 2 && choices.Contains("Attack"))
+                        choice = "Attack";
+                    // Si la vie est plus petite que deux ou que l'IA ne peut pas attaquer et qu'elle peut se défendre, elle défend
+                    else if (source.Health <= 2 && choices.Contains("Defend"))
+                        choice = "Defend";
 
                     break;
 
                 case CharacterClasses.Healer:
-                    if (source.Health <= source.MaxHealth - 2)
-                        choice = 3;
-
-                    else
-                        choice = 1;
+                    // Si la vie du Healer est plus petite ou égale à 2 et que l'IA peut faire son spécial, elle le fait
+                    if (source.Health <= source.MaxHealth - 2 && choices.Contains("Special"))
+                        choice = "Special";
+                    // Sinon, si elle peut attaquer, elle le fait
+                    else if (choices.Contains("Attack"))
+                        choice = "Attack";
 
                     break;
 
                 case CharacterClasses.Tank:
-                    if (source.Health > source.MaxHealth / 2)
-                        choice = 3;
+                    // Si la vie du Tank est supérieure à 3 et qu'il peut faire son spécial, il le fait
+                    if (source.Health > source.MaxHealth / 2 && choices.Contains("Special"))
+                        choice = "Special";
 
-                    else if (source.Health <= 2)
-                        choice = 2;
-
-                    else
-                        choice = 1;
+                    // Sinon, si sa vie est inférieure ou égale à 2 et qu'il peut se défendre, il le fait
+                    else if (source.Health <= 2 && choices.Contains("Defend"))
+                        choice = "Defend";
+                    // Sinon, si il peut attaquer, il le fait
+                    else if(choices.Contains("Attack"))
+                        choice = "Attack";
 
                     break;
             }
-            return choices[choice-1];
+            return choice;
         }
     }
 }

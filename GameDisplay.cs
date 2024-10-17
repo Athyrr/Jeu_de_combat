@@ -158,9 +158,9 @@ namespace Jeu_de_combat
             // Afficher Bouttons et Texte associé 
             string[] t =
             [
-                "Damager\nLife points : ***, Strength : **\nRage : Return back received damages. Damager still takes damages.",
-                "Healer\nLife points : ****, Strength : *\nHeal : Heal 2 life points.",
-                "Tank\nLife points : *****, Strength : *\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
+                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages. Damager still takes damages.",
+                "Healer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
+                "Tank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
                 "Choose a character randomly."
             ];
             return Selector(["Damager", "Healer", "Tank","Random"], t);
@@ -170,9 +170,9 @@ namespace Jeu_de_combat
         {
             Fade();
 
-            FloorAnim();
+            FloorAnim(); // Sol qui arrive
 
-            for (int i = 10; i >= 0; i--)
+            for (int i = 10; i >= 0; i--) // Apparition des joueurs
             {
                 StringToGrid(playerLeft.SpriteLeftInstance, charLeft - i, 2, playerLeft.SpriteColorInstance, 1, 0);
                 StringToGrid(playerRight.SpriteRightInstance, charRight + i, 2, playerRight.SpriteColorInstance, -1, 0);
@@ -181,7 +181,26 @@ namespace Jeu_de_combat
                 PrintGrid();
                 Thread.Sleep(50);
             }
-            PrintGrid();
+
+            string go = "FFFFF I GGGGG H   H TTTTT I"
+                   + "\nF        G     H   H   T   I"
+                   + "\nFFF   I  G  GG HHHHH   T   I"
+                   + "\nF     I  G   G H   H   T    "
+                   + "\nF     I  GGGGG H   H   T   O";
+
+            for (int i = 5; i >= 0; i--)
+            {
+                StringToGrid(go, 12, 1-i, gridTextC, 0, -1);
+                PrintGrid();
+                Thread.Sleep(100);
+            }
+            Thread.Sleep(500);
+            for (int i = 5; i >= 0; i--)
+            {
+                StringToGrid(go, 12, -5 + i, gridTextC, 0, 1);
+                PrintGrid();
+                Thread.Sleep(100);
+            }
         }
 
         public static string Selector(string[] butsText, string[] texts)
@@ -225,7 +244,7 @@ namespace Jeu_de_combat
 
                 // Easter Egg..
                 easterEgg += choice;
-                if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("P5INJ"))
+                if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
                     Beber();
 
             } while (choice != ConsoleKey.Enter);
@@ -368,13 +387,12 @@ namespace Jeu_de_combat
             PrintText();
         }
 
-        public static void TankSpecialAnim(bool lookRight)
+        public static void TankSpecialAnim(bool lookRight, int health)
         {
             // Initialisation des données pour l'animation du joueur gauche
-            int getHealth = 5; // RECUP VIE
             string spr = Tank.SpriteLeft;
             int posX = charLeft;
-            int startX = 1 + getHealth;
+            int startX = 1 + health;
             int tarX = charLeft + 4;
             int s = 1;
 
@@ -382,7 +400,7 @@ namespace Jeu_de_combat
             {
                 posX = charRight;
                 spr = Tank.SpriteRight;
-                startX = xMax - 1 - getHealth;
+                startX = xMax - 1 - health;
                 tarX = charRight + 2;
                 s = -1;
             }
@@ -601,8 +619,8 @@ namespace Jeu_de_combat
         {
             string c1 = "` , ` , ` , ` , ` ,";
             string c2 = " ` , ` , ` , ` , ` ";
-            string confets1 = $"{c1}\n{c2}\n{c1}\n{c2}\n{c1}";
-            string confets2 = $"{c2}\n{c1}\n{c2}\n{c1}\n{c2}";
+            string confets1 = $"{c1}\n{c2}\n{c1}\n{c2}\n{c1}\n{c2}";
+            string confets2 = $"{c2}\n{c1}\n{c2}\n{c1}\n{c2}\n{c1}";
 
             // Effacer les joueurs
             ClearScreen();
@@ -773,12 +791,14 @@ namespace Jeu_de_combat
 
         public static void DisplayCredits()
         {
+            Fade();
             string c = "\"MONOMACHIA\""
                 + "-A P5INJ PRODUCTION"
                 + "-Gameplay Programmer : Adam Adhar"
-            + "-Sound Designer : Elliot Nedellac"
+            + "-Sound Designer : Elliot Nedellec"
             + "-Graphics Implementation : Marius Boulandet"
             + "-Special thanks : Beber"
+            + "-2024©"
             + "---Thanks for playing <3";
             string credits = "";
             foreach (string s in c.Split('-'))

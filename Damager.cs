@@ -105,7 +105,7 @@
         /// <inheritdoc cref="Character.SpecialAttack"/>
         /// Use the damager special attack. Inflics back damages to the source.
         /// </summary>
-        public override void SpecialAttack(Character target, bool lookRight)
+        public override void SpecialAttack(Character target)
         {
             _specialEffectEnabled = true;
         }

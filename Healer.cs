@@ -65,10 +65,10 @@
 
 
         ///<inheritdoc cref="Character.SpecialAttack(Character)"/>
-        public override void SpecialAttack(Character target, bool lookRight)
+        public override void SpecialAttack(Character target)
         {
             Health = Math.Min(Health + 2, MaxHealth);
-            GameDisplay.HealerSpecialAnim(lookRight);
+            GameDisplay.HealerSpecialAnim(IsLeft);
         }
 
         #endregion

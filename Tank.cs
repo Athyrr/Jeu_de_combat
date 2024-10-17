@@ -89,15 +89,9 @@ namespace Jeu_de_combat
         /// <inheritdoc cref=" Character.SpecialAttack"/>
         /// Inflics 1 damage more but sacrifices 1 health.
         /// </summary>
-        public override void SpecialAttack(Character target, bool lookRight)
+        public override void SpecialAttack(Character target)
         {
-            GameDisplay.TankSpecialAnim(lookRight);
-            if (Health < 2)
-            {
-                Console.WriteLine("Cannot use Tank special, You don't have enough health");
-                return;
-            }
-
+            GameDisplay.TankSpecialAnim(IsLeft, Health);
             _specialEffectEnabled = true;
 
             Health--;
