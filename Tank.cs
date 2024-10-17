@@ -1,4 +1,6 @@
-﻿namespace Jeu_de_combat
+﻿using System.Text;
+
+namespace Jeu_de_combat
 {
     /// <summary>
     /// Defines a Tank character.
@@ -18,6 +20,9 @@
 
         ///<inheritdoc cref="Character.MaxHealth"/>
         private int _maxHealth = 5;
+
+        ///<inheritdoc cref="Character.SpecialDescription"/>
+        private string _specialDescription = "Strong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.";
 
         /// <summary>
         /// Is the damager special used?
@@ -84,8 +89,9 @@
         /// <inheritdoc cref=" Character.SpecialAttack"/>
         /// Inflics 1 damage more but sacrifices 1 health.
         /// </summary>
-        public override void SpecialAttack(Character target)
+        public override void SpecialAttack(Character target, bool lookRight)
         {
+            GameDisplay.TankSpecialAnim(lookRight);
             if (Health < 2)
             {
                 Console.WriteLine("Cannot use Tank special, You don't have enough health");
@@ -107,6 +113,7 @@
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+            SpecialDescription = _specialDescription;
 
             SpriteColorInstance = _spriteColor;
             SpriteLeftInstance = _spriteLeft;

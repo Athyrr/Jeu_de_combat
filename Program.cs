@@ -49,7 +49,7 @@
         {
             GameDisplay.Init();
 
-            GameState state = GameState.Intro;
+            GameState state = GameState.PlayerSelection;
 
             _isRunning = true;
 
@@ -91,22 +91,25 @@
                         break;
 
                     case GameState.PlayerSelection:
-
+                        Random rand = new Random();
                         Console.WriteLine();
                         string characterString = "";
+                        string[] characters = ["Damager", "Healer", "Tank"];
 
                         if (!_wantAI)
                             characterString = GameDisplay.DisplayCharacterSelection();
 
+                        if (characterString == "Random")
+                            characterString = characters[rand.Next(0, 3)];
                         _player1 = PlayerSelection(_wantAI, characterString);
                         _player1.IsIA = _wantAI;
-                        Console.WriteLine($"Player 1 picked : {_player1.Name}");
+                        _player1.IsLeft = true;
 
                         if (!_wantAI) _wantAI = true;
 
                         _player2 = PlayerSelection(_wantAI, characterString);
                         _player2.IsIA = _wantAI;
-                        Console.WriteLine($"Player 2 picked : {_player2.Name}");
+                        _player2.IsLeft = false;
 
                         state = GameState.Game;
                         break;
@@ -192,20 +195,21 @@
         /// </summary>
         private static void Game()
         {
-            Console.WriteLine();
-            Console.WriteLine("|| FIGHTTTTTTTTTTT ||");
-            Console.WriteLine();
-
-            //FightDisplay(Charatcter player1, CHaracter player2)
+            // a enlever plus tard maybe
+            Random rand = new Random();
+            difficulty = rand.Next(1, 4);
 
             while (!_stopFighting)
             {
                 Choice(_player1, _player2);
                 Choice(_player2, _player1);
 
+                GameDisplay.ClearScreen(false);
                 ProcessDefends(_defendProcesses);
                 ProcessAttacks(_attackProcesses);
                 ProcessDamagersSpecial();
+                GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
+                GameDisplay.DefenseAnim(true, true);
 
                 ResetEffects();
                 ClearProcesses();
@@ -218,30 +222,36 @@
         /// <param name="source">The player who will act</param>
         /// <param name="target">The target character who will receive the attack</param>
         /// <returns></returns>
-        private static int Choice(Character source, Character target)
+        private static string Choice(Character source, Character target)
         {
-            int choice = 0;
+            string choice = "";
 
             if (!source.IsIA)
             {
-                string question = $"(player 1) {source.Name} : What would you like to do ?\n1: attack | 2: defend | 3: special attack";
-                choice = AskForInput(question, 1, 3);
+                string question = $"(Player 1) {source.Name} : What would you like to do ?\n\n";
+                string[] texts =
+                {
+                    $"{question}Attack : Infliges {source.Strength} damages",
+                    $"{question}Defend : Prevent from getting damages if the opponent attack",
+                    $"{question}{source.SpecialDescription}"
+                };
+
+                choice = GameDisplay.Selector(["Attack", "Defend", "Special"], texts);
             }
             else
             {
-                Console.WriteLine("(AI) Je reflechis");
                 choice = AIBehavior(source);
 
                 Thread.Sleep(500);
             }
 
-            if (choice == 1)
+            if (choice == "Attack")
                 _attackProcesses.Add(new AttackProcess(source, target, false, source.Strength));
 
-            if (choice == 3)
+            if (choice == "Special")
                 _attackProcesses.Add(new AttackProcess(source, target, true, source.Strength));
 
-            if (choice == 2)
+            if (choice == "Defend")
                 _defendProcesses.Add(new DefendProcess(source));
 
             return choice;
@@ -284,24 +294,12 @@
             return false;
         }
 
-        public static int AskForInput(string question, int min, int max)
-        {
-            int output = 0;
-            Console.WriteLine(question);
-            while (!int.TryParse(Console.ReadLine(), out output) || output > max || output < min)
-            {
-                Console.WriteLine("Invalid input");
-                Console.WriteLine(question);
-            }
-
-            return output;
-        }
-
         /// <summary>
         /// Resets all active effects.
         /// </summary>
         private static void ResetEffects()
         {
+            GameDisplay.DefenseAnim(true, true);
             _player1.ResetEffects();
             _player2.ResetEffects();
         }
@@ -326,20 +324,20 @@
 
             foreach (AttackProcess process in processes)
             {
-                string name = process.Source == _player1 ? "(Player 1)" : "(Player 2)";
-
                 if (process.IsSpecial)
                 {
-                    Console.WriteLine($"{name} {process.Source.Name} use his special attack !");
-                    process.Source.SpecialAttack(process.Target);
+                    process.Source.SpecialAttack(process.Target, process.Source.IsLeft);
                 }
                 else
                 {
-                    Console.WriteLine($"{name} {process.Source.Name} attacks !");
+                    GameDisplay.ChooseAttack(process.Source);
                     process.Source.Attack(process.Target, process.DamageAmount);
                 }
                 if (EndGame(_player1, _player2))
                     return;
+
+                GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
+                Thread.Sleep(1000);
             }
         }
 
@@ -354,8 +352,7 @@
 
             foreach (var process in processes)
             {
-                Console.WriteLine($"{process.Defender.Name} defends !");
-                process.Defender.Defend();
+                process.Defender.Defend(process.Defender.IsLeft);
             }
         }
 
@@ -370,7 +367,7 @@
             if (_player1 is Damager damager1 && damager1.SpecialEffectEnabled)
             {
                 int reveivedDamages = damager1.DamagesTaken;
-                Console.WriteLine("Reflects " + damager1.DamagesTaken + " dmg.");
+                GameDisplay.DamagerSpecialAnim(true, reveivedDamages);
                 _player1.Attack(_player2, reveivedDamages);
 
                 if (EndGame(_player1, _player2))
@@ -380,7 +377,7 @@
             if (_player2 is Damager damager2 && damager2.SpecialEffectEnabled)
             {
                 int reveivedDamages = damager2.DamagesTaken;
-                Console.WriteLine("Reflects " + damager2.DamagesTaken + " dmg.");
+                GameDisplay.DamagerSpecialAnim(false, reveivedDamages);
                 _player2.Attack(_player1, reveivedDamages);
 
                 if (EndGame(_player1, _player2))
@@ -405,10 +402,11 @@
         /// <summary>
         /// IA behaviour depending on current diffculty
         /// </summary>
-        public static int AIBehavior(Character source)
+        public static string AIBehavior(Character source)
         {
             Random rand = new Random();
             bool followBehaviour = true;
+            string[] choices = ["Attack", "Defend", "Special"];
 
             switch (difficulty)
             {
@@ -429,8 +427,8 @@
             }
 
             int choice = rand.Next(1, 4);
-            if (!followBehaviour || difficulty == 1)
-                return choice;
+            //if (!followBehaviour)
+            //    return choices[choice-1];
 
 
             switch (source.CharacterClass)
@@ -471,7 +469,7 @@
 
                     break;
             }
-            return choice;
+            return choices[choice-1];
         }
     }
 }

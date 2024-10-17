@@ -19,6 +19,9 @@
         ///<inheritdoc cref="Character.MaxHealth"/>
         private int _maxHealth = 3;
 
+        /// <inheritdoc cref="Character.SpecialDescription"/>
+        private string _specialDescription = "Rage : Return back received damages. Damager still takes damages.";
+       
         /// <summary>
         /// Was the Damager special attack used?
         /// </summary>
@@ -102,7 +105,7 @@
         /// <inheritdoc cref="Character.SpecialAttack"/>
         /// Use the damager special attack. Inflics back damages to the source.
         /// </summary>
-        public override void SpecialAttack(Character target)
+        public override void SpecialAttack(Character target, bool lookRight)
         {
             _specialEffectEnabled = true;
         }
@@ -130,6 +133,7 @@
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+            SpecialDescription = _specialDescription;
 
             SpriteLeftInstance = _spriteLeft;
 

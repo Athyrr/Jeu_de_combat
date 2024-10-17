@@ -19,6 +19,9 @@
         ///<inheritdoc cref="Character.MaxHealth"/>
         private int _maxHealth = 4;
 
+        ///<inheritdoc cref="Character.SpecialDescription"/>
+        private string _specialDescription = "Heal : Heal 2 life points.";
+
 
         ///<inheritdoc cref="Character.SpriteLeft"/>
         private static string _spriteLeft = "   A @ \n  /|-| \n   | | \n  / \\  ";
@@ -62,14 +65,10 @@
 
 
         ///<inheritdoc cref="Character.SpecialAttack(Character)"/>
-        public override void SpecialAttack(Character target)
+        public override void SpecialAttack(Character target, bool lookRight)
         {
             Health = Math.Min(Health + 2, MaxHealth);
-
-            Console.WriteLine("Heal !");
-
-            string playerIndexString = IsIA ? "(player 2)" : "(player 1)";
-            Console.WriteLine($"{playerIndexString} Health : " + Health);
+            GameDisplay.HealerSpecialAnim(lookRight);
         }
 
         #endregion
@@ -89,6 +88,7 @@
             MaxHealth = _maxHealth;
             Health = _maxHealth;
             Strength = _strength;
+            SpecialDescription = _specialDescription;
 
             SpriteLeftInstance = _spriteLeft;
 

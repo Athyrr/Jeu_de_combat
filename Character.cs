@@ -37,6 +37,16 @@
         /// </summary>
         private bool _isIA = false;
 
+        /// <summary>
+        /// If the Character is on left or on right
+        /// </summary>
+        private bool _isLeft = true;
+
+        /// <summary>
+        /// Explication of character's special
+        /// </summary>
+        private string _specialDescription = "";
+
         //Sprites
 
         /// <summary>
@@ -79,6 +89,12 @@
         ///<inheritdoc cref="_isIA"/>
         public bool IsIA { get => _isIA; set => _isIA = value; }
 
+        ///<inheritdoc cref="_isLeft"/>
+        public bool IsLeft { get => _isLeft; set => _isLeft = value; }
+
+        ///<inheritdoc cref="_specialDescription"/>
+        public string SpecialDescription { get => _specialDescription; protected set => _specialDescription = value; }
+        
         /// <summary>
         /// The class of the character
         /// </summary>
@@ -135,23 +151,19 @@
 
 
             _health = Math.Max(0, _health - damageAmount);
-
-            string name = !IsIA ? "(Player 1)" : "(Player 2)";
-
-            Console.WriteLine($"{name} {_name} damages received : {damageAmount}.");
-            Console.WriteLine($"{name} {_name} remaning life : {_health}.");
         }
 
         /// <summary>
         /// Use character special attack.
         /// </summary>
-        public abstract void SpecialAttack(Character target);
+        public abstract void SpecialAttack(Character target, bool lookRight);
 
         /// <summary>
         /// Defends the character, and avoid taken damages.
         /// </summary>
-        public void Defend()
+        public void Defend(bool lookRight)
         {
+            GameDisplay.DefenseAnim(lookRight);
             _isDefending = true;
         }
 
