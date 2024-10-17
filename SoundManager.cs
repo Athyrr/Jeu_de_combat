@@ -27,7 +27,7 @@ namespace Jeu_de_combat
                 "win.mp3"           //1up 1 - Sound effects Pack 2
             };
 
-        static Dictionary<string, WindowsMediaPlayer> sounds = new();
+        private static Dictionary<string, WindowsMediaPlayer> sounds = new();
 
         /// <summary>
         /// Load all sounds in a dictionnary. It must be called at the beginning of the game.
@@ -47,7 +47,7 @@ namespace Jeu_de_combat
         /// </summary>
         /// <param name="sound">file name of the sound</param>
         /// <param name="loop">to make the sound loop. False by default</param>
-        public static void Play(string sound, bool loop=false)
+        public static void Play(string sound, bool loop = false)
         {
             sounds[sound].controls.play();
             if (loop)
