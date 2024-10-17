@@ -48,6 +48,9 @@
         public static void Main(string[] args)
         {
             GameDisplay.Init();
+            SoundManager.Init();
+
+
 
             GameState state = GameState.Intro;
 
@@ -82,6 +85,7 @@
                         break;
 
                     case GameState.GameModeSelection:
+
                         string mode = GameDisplay.DisplayGameModeSelection();
                         _wantAI = GameModeSelection(mode);
 
@@ -89,6 +93,7 @@
                         break;
 
                     case GameState.PlayerSelection:
+
                         Random rand = new Random();
                         Console.WriteLine();
                         string characterString = "";
@@ -98,7 +103,8 @@
                             characterString = GameDisplay.DisplayCharacterSelection();
 
                         if (characterString == "Random")
-                            characterString = characters[rand.Next(0, 3)];
+                            characterString = characters[rand.Next(0, characterString.Length)];
+
                         _player1 = PlayerSelection(_wantAI, characterString);
                         _player1.IsIA = _wantAI;
                         _player1.IsLeft = true;
@@ -113,6 +119,7 @@
                         break;
 
                     case GameState.Game:
+
                         GameDisplay.DisplayFight(_player1, _player2);
                         Game();
 
@@ -194,12 +201,12 @@
         {
             // a enlever plus tard maybe
             Random rand = new Random();
-            difficulty = rand.Next(1, 4);
+            difficulty = rand.Next(1, 3);
 
             while (!_stopFighting)
             {
-                Choice(_player1, _player2);
-                Choice(_player2, _player1);
+                AttackSelection(_player1, _player2);
+                AttackSelection(_player2, _player1);
 
                 GameDisplay.ClearScreen(false);
                 ProcessDefends(_defendProcesses);
@@ -220,7 +227,7 @@
         /// <param name="source">The player who will act</param>
         /// <param name="target">The target character who will receive the attack</param>
         /// <returns></returns>
-        private static string Choice(Character source, Character target)
+        private static string AttackSelection(Character source, Character target)
         {
             string choice = "";
             List<string> choices = ["Attack", "Defend", "Special"];
@@ -242,9 +249,9 @@
             {
 
                 int id = choices.IndexOf(source.previousChoice);
-                if(id>0)
+                if (id > 0)
                 {
-                    choices.RemoveAt(id); 
+                    choices.RemoveAt(id);
                     choicesText.RemoveAt(id);
                 }
 
@@ -260,7 +267,7 @@
             {
                 choices.Remove(source.previousChoice);
                 choice = AIBehavior(source, choices.ToArray());
-                if(choice != "Attack")
+                if (choice != "Attack")
                     source.previousChoice = choice;
                 Thread.Sleep(500);
             }
@@ -496,7 +503,7 @@
                     else if (source.Health <= 2 && choices.Contains("Defend"))
                         choice = "Defend";
                     // Sinon, si il peut attaquer, il le fait
-                    else if(choices.Contains("Attack"))
+                    else if (choices.Contains("Attack"))
                         choice = "Attack";
 
                     break;
