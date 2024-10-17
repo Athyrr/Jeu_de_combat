@@ -597,19 +597,43 @@ namespace Jeu_de_combat
 
         }
 
-        static void Start() // Sah je pense c'est guez on peut enlever
+        public static void DisplayEndGame(Character source) // Sah je pense c'est guez on peut enlever
         {
-            string start = "SSSSS TTTTT    A   RRRRR TTTTT  |"
-                       + "\nS       T     A A  R   R   T    |"
-                       + "\nSSSSS   T    AAAAA RRRRR   T    |"
-                       + "\n    S   T    A   A R  R    T    |"
-                       + "\nSSSSS   T    A   A R   R   T    O"
-                       + "\n_________________________________";
+            string c1 = "` , ` , ` , ` , ` ,";
+            string c2 = " ` , ` , ` , ` , ` ";
+            string confets1 = $"{c1}\n{c2}\n{c1}\n{c2}\n{c1}";
+            string confets2 = $"{c2}\n{c1}\n{c2}\n{c1}\n{c2}";
 
-            for (int x = -32; x <= xMax + 1; x++)
+            // Effacer les joueurs
+            ClearScreen();
+
+            // Placer le perso gagant au centre
+            StringToGrid(source.SpriteLeftInstance, charLeft + 17, 2, source.SpriteColorInstance);
+
+            // Animation des confettis qui arrivent 
+            for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(start, x, 1, gridTextC, -1, 0);
+                StringToGrid(confets1, 1, 1 - i, ConsoleColor.Yellow, -1, 0);
+                StringToGrid(confets1, xMax - 20, 1 - i, ConsoleColor.Yellow, -1, 0);
                 PrintGrid();
+                Thread.Sleep(200);
+            }
+
+            // Animation qui fait croire que des confettis tombent en bouclent
+            for (int i = 0; i < 20; i++)
+            {
+                if (i % 2 == 1)
+                {
+                    StringToGrid(confets1, 1, 1, ConsoleColor.Yellow);
+                    StringToGrid(confets1, xMax - 20, 1, ConsoleColor.Yellow);
+                }
+                else
+                {
+                    StringToGrid(confets2, 1, 1, ConsoleColor.Yellow);
+                    StringToGrid(confets2, xMax - 20, 1, ConsoleColor.Yellow);
+                }
+                PrintGrid();
+                Thread.Sleep(200);
             }
         }
 
@@ -723,11 +747,15 @@ namespace Jeu_de_combat
 
         public static void ClearScreen(bool grid = true, bool buttons = true, bool text = true)
         {
-            if (grid)
+            if (grid) 
             {
-                Console.SetCursorPosition(0, 0);
-                for (int i = 0; i < butTop-1; i++)
-                    Console.WriteLine(new string(' ', Console.WindowWidth));
+                // Efface toute la grille
+                //Console.SetCursorPosition(0, 0);
+                //for (int i = 0; i < butTop-1; i++)
+                //    Console.WriteLine(new string(' ', Console.WindowWidth
+                //    
+                // Efface l'intérieur de la grille
+                StringToGrid(_emptyGridString, 0, 0, defaultColor);
             }
             if (buttons)
             {

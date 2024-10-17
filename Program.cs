@@ -49,7 +49,7 @@
         {
             GameDisplay.Init();
 
-            GameState state = GameState.PlayerSelection;
+            GameState state = GameState.Intro;
 
             _isRunning = true;
 
@@ -277,17 +277,19 @@
 
             if (!player1.IsAlive && player2.IsAlive)
             {
-                Console.WriteLine($"(player 2) {player2.Name} slayed (player 1) {player1.Name}.");
-                Console.WriteLine("Player 2 won !");
+                //Console.WriteLine($"(player 2) {player2.Name} slayed (player 1) {player1.Name}.");
+                //Console.WriteLine("Player 2 won !");
                 _stopFighting = true;
+                GameDisplay.DisplayEndGame(player2);
                 return true;
             }
 
             if (player1.IsAlive && !player2.IsAlive)
             {
-                Console.WriteLine($"(player 1) {player1.Name} slayed (player 2) {player2.Name}.");
-                Console.WriteLine("Player 1 won !");
+                //Console.WriteLine($"(player 1) {player1.Name} slayed (player 2) {player2.Name}.");
+                //Console.WriteLine("Player 1 won !");
                 _stopFighting = true;
+                GameDisplay.DisplayEndGame(player1);
                 return true;
             }
 
