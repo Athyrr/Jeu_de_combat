@@ -51,9 +51,7 @@
 
             GameState state = GameState.Intro;
 
-            _isRunning = true;
-
-            while (_isRunning)
+            while (true)
             {
                 switch (state)
                 {
@@ -117,7 +115,6 @@
                     case GameState.Game:
                         GameDisplay.DisplayFight(_player1, _player2);
                         Game();
-                        _isRunning = false;
 
                         state = GameState.Credit;
                         break;
@@ -208,7 +205,8 @@
                 ProcessDefends(_defendProcesses);
                 ProcessAttacks(_attackProcesses);
                 ProcessDamagersSpecial();
-                GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
+
+                //GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
                 GameDisplay.DefenseAnim(true, true);
 
                 ResetEffects();
@@ -234,8 +232,15 @@
                 $"{question}{source.SpecialDescription}"
             };
 
+            if (source is Healer && source.Health >= source.MaxHealth - 1 || source is Tank && source.Health == 1)
+            {
+                choices.Remove("Special");
+                choicesText.RemoveAt(2);
+            }
+
             if (!source.IsIA)
             {
+
                 int id = choices.IndexOf(source.previousChoice);
                 if(id>0)
                 {
@@ -243,6 +248,7 @@
                     choicesText.RemoveAt(id);
                 }
 
+         
                 choice = GameDisplay.Selector(choices.ToArray(), choicesText.ToArray());
                 if (choice == "Attack")
                     source.previousChoice = "";
@@ -283,27 +289,26 @@
 
             if (!player1.IsAlive && !player2.IsAlive)
             {
-                Console.WriteLine($"(player1) {player1.Name} and (player 2) {player2.Name} are both dead.");
-                Console.WriteLine("Draw !");
+                GameDisplay.text = "Draw !";
                 _stopFighting = true;
                 return true;
             }
 
             if (!player1.IsAlive && player2.IsAlive)
             {
-                //Console.WriteLine($"(player 2) {player2.Name} slayed (player 1) {player1.Name}.");
-                //Console.WriteLine("Player 2 won !");
+                GameDisplay.text = $"{player1.Name} (Player 1) wins !";
+                GameDisplay.PrintText();
                 _stopFighting = true;
-                GameDisplay.DisplayEndGame(player2);
+                GameDisplay.DisplayEndGame(player2, player1);
                 return true;
             }
 
             if (player1.IsAlive && !player2.IsAlive)
             {
-                //Console.WriteLine($"(player 1) {player1.Name} slayed (player 2) {player2.Name}.");
-                //Console.WriteLine("Player 1 won !");
+                GameDisplay.text = $"{player1.Name} (Player 2) wins !";
+                GameDisplay.PrintText();
                 _stopFighting = true;
-                GameDisplay.DisplayEndGame(player1);
+                GameDisplay.DisplayEndGame(player1, player2);
                 return true;
             }
 
@@ -342,15 +347,26 @@
             {
                 if (process.IsSpecial)
                 {
+                    string whichPlayer = process.Source.IsLeft ? "Player 1" : "Player 2";
+                    GameDisplay.text = $"{process.Source.Name} ({whichPlayer}) uses his special !";
+                    GameDisplay.PrintText();
+
                     process.Source.SpecialAttack(process.Target);
                 }
                 else
                 {
+                    string whichPlayer = process.Source.IsLeft ? "Player 1" : "Player 2";
+                    GameDisplay.text = $"{process.Source.Name} ({whichPlayer}) attacks !";
+                    GameDisplay.PrintText();
+
                     GameDisplay.ChooseAttack(process.Source);
                     process.Source.Attack(process.Target, process.DamageAmount);
                 }
                 if (EndGame(_player1, _player2))
+                {
+                    GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
                     return;
+                }
 
                 GameDisplay.UpdateLifePoints(_player1.Health, _player2.Health);
                 Thread.Sleep(1000);
@@ -368,6 +384,9 @@
 
             foreach (var process in processes)
             {
+                string whichPlayer = process.Defender.IsLeft ? "Player 1" : "Player 2";
+                GameDisplay.text = $"{process.Defender.Name} ({whichPlayer}) defends itself !";
+                GameDisplay.PrintText();
                 process.Defender.Defend(process.Defender.IsLeft);
             }
         }
