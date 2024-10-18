@@ -8,7 +8,8 @@
         None,
         Intro,
         GameModeSelection,
-        PlayerSelection,
+        CharacterSelection,
+        AISelection,
         Game,
         Credit
     }

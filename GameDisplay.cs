@@ -141,7 +141,7 @@ namespace Jeu_de_combat
             return Selector(["Player vs AI", "AI vs AI"], [_defaultText]);
         }
 
-        public static string DisplayCharacterSelection()
+        public static string DisplayCharacterSelection(string text)
         {
             Fade();
             string randomSprite = " ????? \n     ? \n   ??? \n   ?   \n";
@@ -153,18 +153,56 @@ namespace Jeu_de_combat
                 StringToGrid(Tank.SpriteRight, 27, y, Tank.SpriteColor, 0, 1);
                 StringToGrid(randomSprite, 38, y, gridTextC, 0, 1);
                 PrintGrid();
-                Thread.Sleep(100);
+                Thread.Sleep(75);
             }
             PrintGrid();
             // Afficher Bouttons et Texte associé 
             string[] t =
             [
-                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages doubled. Damager still takes damages.",
-                "Healer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
-                "Tank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
-                "Choose a character randomly."
+                $"{text}\nDamager\nLife points : ***, Strength : ++\nRage : Return back received damages doubled. Damager still takes damages.",
+                $"{text}\nHealer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
+                $"{text}\nTank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
+                $"{text}\nChoose a character randomly."
             ];
             return Selector(["Damager", "Healer", "Tank","Random"], t);
+        }
+
+        public static string DisplayIALevelSelection(bool AIvsAI)
+        {
+            Fade();
+
+            string tyche = "   O   \n L/|\\  \n   |   \n  / \\  ";
+            string athena = "\\ 8O   \n \\/|-0 \n  \\|   \n  / \\  ";
+            string zeus = " / O   \n \\/|\\  \n / |   \n  / \\  ";
+            string[] sprites = [tyche, athena, zeus];
+            string text = "Choose which IA you want to fight :";
+            List<ConsoleColor> colors = [ConsoleColor.Cyan, ConsoleColor.DarkGreen, ConsoleColor.Yellow];
+            string[] buts = ["Tyche", "Athena", "Zeus"];
+            List<string> texts = new List<string> {
+                $"{text}\nGoddess of luck, she'll bet everything on fate to win.",
+                $"{text}\nGoddess of strategy, she will provide a duel worthy of the name.",
+                $"{text}\nAbsolute God of Gods, this omniscient entity is faster and smarter than you, by far."
+            };
+            if (AIvsAI) // On enlève le mode Zeus si on a du AI vs AI 
+            {
+                buts = ["Tyche", "Athena"];
+                sprites = [tyche, athena];
+                texts.RemoveAt(2);
+            }
+
+            // Afficher sprites sur grid
+            int a = AIvsAI ? 5 : 0; // Donnée pour bien caler l'emplacement des sprites selon si Zeus apparaît ou non (AIvsAI)
+            for (int y = yMax + 1; y >= 2; y--)
+            {
+                for (int i = 0; i < sprites.Length; i++)
+                {
+                    StringToGrid(sprites[i], (i + 1) * 8 + a + (6 + a) * i, y, colors[i], 0, 1);
+                    PrintGrid();
+                    Thread.Sleep(50);
+                }
+            }
+
+            return Selector(buts, texts.ToArray());
         }
 
         public static void DisplayFight(Character playerLeft, Character playerRight)
