@@ -52,8 +52,6 @@ namespace Jeu_de_combat
             GameDisplay.Init();
             SoundManager.Init();
 
-
-
             GameState state = GameState.Intro;
 
             while (true)
@@ -426,20 +424,6 @@ namespace Jeu_de_combat
                 if (EndGame(_player1, _player2))
                     return;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns>Returns an int that represent the class of the character</returns>
-        public static int CharacterType(Character source)
-        {
-            if (source is Damager)
-                return 1;
-            else if (source is Healer)
-                return 2;
-            else return 3;
         }
 
         /// <summary>
