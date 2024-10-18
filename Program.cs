@@ -45,7 +45,7 @@ namespace Jeu_de_combat
         /// <summary>
         /// The difficulty of the game
         /// </summary>
-        private static int difficulty;
+        private static int difficulty = 2;
 
         public static void Main(string[] args)
         {
@@ -61,7 +61,8 @@ namespace Jeu_de_combat
                 switch (state)
                 {
                     case GameState.Intro:
-
+                        SoundManager.StopAllLoops();
+                        SoundManager.Play("bg_menu.mp3", true);
                         string menu = GameDisplay.DisplayMenu();
 
                         switch (menu)
@@ -122,13 +123,21 @@ namespace Jeu_de_combat
 
                     case GameState.Game:
 
+                        SoundManager.StopAllLoops();
+                        SoundManager.Play("bg_fight.mp3", true);
+
                         GameDisplay.DisplayFight(_player1, _player2);
+
                         Game();
 
                         state = GameState.Credit;
                         break;
 
                     case GameState.Credit:
+
+                        SoundManager.StopAllLoops();
+                        SoundManager.Play("credits.mp3", true);
+
                         GameDisplay.DisplayCredits();
 
                         state = GameState.Intro;
@@ -438,7 +447,7 @@ namespace Jeu_de_combat
         }
 
         /// <summary>
-        /// IA behaviour depending on current diffculty
+        /// AI behaviour depending on current difficulty
         /// </summary>
         public static string AIBehavior(Character source, string[] choices, Character target)
         {

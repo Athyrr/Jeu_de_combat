@@ -825,6 +825,8 @@ namespace Jeu_de_combat
 
         private static void Beber() // Un petit easter egg en l'hommage de notre promo et de sa mascotte !
         {
+            SoundManager.StopAllLoops();
+            SoundManager.Play("credits.mp3", true);
             Fade(true, true);
             ConsoleColor beberC = ConsoleColor.DarkYellow;
             string beberText = "oo  ooo oo  ooo ooo"
