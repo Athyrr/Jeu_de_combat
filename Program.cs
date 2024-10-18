@@ -62,7 +62,6 @@ namespace Jeu_de_combat
                 {
                     case GameState.Intro:
                         SoundManager.StopAllLoops();
-                        SoundManager.Play("bg_menu.mp3", true);
                         string menu = GameDisplay.DisplayMenu();
 
                         switch (menu)
@@ -124,7 +123,6 @@ namespace Jeu_de_combat
                     case GameState.Game:
 
                         SoundManager.StopAllLoops();
-                        SoundManager.Play("bg_fight.mp3", true);
 
                         GameDisplay.DisplayFight(_player1, _player2);
 
@@ -136,7 +134,6 @@ namespace Jeu_de_combat
                     case GameState.Credit:
 
                         SoundManager.StopAllLoops();
-                        SoundManager.Play("credits.mp3", true);
 
                         GameDisplay.DisplayCredits();
 
@@ -213,7 +210,7 @@ namespace Jeu_de_combat
             // a enlever plus tard maybe
             Random rand = new Random();
             //difficulty = rand.Next(1, 4);
-            difficulty = 3;
+            difficulty = 1;
 
             while (!_stopFighting)
             {
@@ -265,7 +262,8 @@ namespace Jeu_de_combat
             int id = -1;
             if(source.previousChoices.Count > 0)
                 id = choices.IndexOf(source.previousChoices[source.previousChoices.Count-1]);
-            if (id >= 0)
+
+            if (id >= 0 && source.previousChoices[source.previousChoices.Count - 1] != "Attack")
             {
                 choices.RemoveAt(id);
                 choicesText.RemoveAt(id);
@@ -313,7 +311,6 @@ namespace Jeu_de_combat
 
             if (!player1.IsAlive && player2.IsAlive)
             {
-                Console.WriteLine($"{player1.Name} (Player 1) wins !");
                 _stopFighting = true;
                 GameDisplay.DisplayEndGame(player2, player1);
                 return true;
@@ -321,7 +318,6 @@ namespace Jeu_de_combat
 
             if (player1.IsAlive && !player2.IsAlive)
             {
-                Console.WriteLine($"{player1.Name} (Player 2) wins !");
                 _stopFighting = true;
                 GameDisplay.DisplayEndGame(player1, player2);
                 return true;
