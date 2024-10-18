@@ -113,7 +113,7 @@
         /// <summary>
         /// Player previous action - Adam wallah pardon
         /// </summary>
-        public string previousChoice = ""; 
+        public List<string> previousChoices = new List<string>(); 
 
 
         /// <summary>
