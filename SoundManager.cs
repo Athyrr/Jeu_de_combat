@@ -28,6 +28,7 @@ namespace Jeu_de_combat
             };
 
         private static Dictionary<string, WindowsMediaPlayer> sounds = new();
+        private static List<string> loops = new();
 
         /// <summary>
         /// Load all sounds in a dictionnary. It must be called at the beginning of the game.
@@ -51,7 +52,10 @@ namespace Jeu_de_combat
         {
             sounds[sound].controls.play();
             if (loop)
+            {
                 sounds[sound].settings.setMode("loop", true);
+                loops.Add(sound);
+            }
         }
 
         /// <summary>
@@ -67,9 +71,18 @@ namespace Jeu_de_combat
         /// return if the sound is playing or not
         /// </summary>
         /// <returns></returns>
-        static bool IsSoundRunning(string sound)
+        public static bool IsSoundRunning(string sound)
         {
             return sounds[sound].playState == WMPPlayState.wmppsPlaying;
+        }
+
+        public static void StopAllLoops()
+        {
+            foreach(var sound in loops)
+            {
+                Stop(sound);
+            }
+            loops.Clear();
         }
     }
 }

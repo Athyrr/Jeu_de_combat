@@ -59,6 +59,7 @@
                 switch (state)
                 {
                     case GameState.Intro:
+                        SoundManager.StopAllLoops();
                         SoundManager.Play("bg_menu.mp3", true);
                         string menu = GameDisplay.DisplayMenu();
 
@@ -120,17 +121,21 @@
 
                     case GameState.Game:
 
-                        SoundManager.Stop("bg_menu.mp3");
-                        SoundManager.Play("bg_fight.mp3");
+                        SoundManager.StopAllLoops();
+                        SoundManager.Play("bg_fight.mp3", true);
+
                         GameDisplay.DisplayFight(_player1, _player2);
+
                         Game();
 
                         state = GameState.Credit;
                         break;
 
                     case GameState.Credit:
-                        //arrêter musique en cours
+
+                        SoundManager.StopAllLoops();
                         SoundManager.Play("credits.mp3", true);
+
                         GameDisplay.DisplayCredits();
 
                         state = GameState.Intro;
