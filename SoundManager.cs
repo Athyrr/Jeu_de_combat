@@ -14,6 +14,7 @@ namespace Jeu_de_combat
                 "bg_menu.mp3",  //land with no dragons
                 "bg_fight.mp3", //herding cats
                 "credits.mp3",  //admin rights - full
+                "win2.mp3",     //Claimed
 
                 //sfx
                 "arrow_key.mp3",    //Blip 7 - Sound effects Pack 2
@@ -24,7 +25,9 @@ namespace Jeu_de_combat
                 "lose.mp3",         //Lose 6 - Sound effects Pack 2
                 "spark.mp3",        //1up 8 - Sound effects Pack 2
                 "spell.mp3",        //1up 3 - Sound effects Pack 2
-                "win.mp3"           //1up 1 - Sound effects Pack 2
+                "win.mp3",          //1up 1 - Sound effects Pack 2
+                "defend.mp3",       //Teleport 2 - Sound effects Pack 2
+                "defend_break.mp3"  //Teleport 8 - Sound effects Pack 2
             };
 
         private static Dictionary<string, WindowsMediaPlayer> sounds = new();
