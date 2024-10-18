@@ -44,6 +44,8 @@ namespace Jeu_de_combat
                 sounds[file].URL = path + file;
                 sounds[file].controls.stop();
             }
+            sounds["arrow_key.mp3"].settings.volume = 30;
+            sounds["selection.mp3"].settings.volume = 30;
         }
 
         /// <summary>

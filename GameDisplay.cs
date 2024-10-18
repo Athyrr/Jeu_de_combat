@@ -113,6 +113,7 @@ namespace Jeu_de_combat
             title = title.Replace('M', t); title = title.Replace('O', t); title = title.Replace('N', t);
             title = title.Replace('A', t); title = title.Replace('C', t); title = title.Replace('H', t); title = title.Replace('I', t);
 
+            SoundManager.Play("bg_menu.mp3", true);
             for (int y = yMax + 1; y > 1; y--)
             {
                 StringToGrid(title, 2, y, gridTextC, 0, 1);
@@ -158,7 +159,7 @@ namespace Jeu_de_combat
             // Afficher Bouttons et Texte associé 
             string[] t =
             [
-                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages. Damager still takes damages.",
+                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages doubled. Damager still takes damages.",
                 "Healer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
                 "Tank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
                 "Choose a character randomly."
@@ -170,6 +171,7 @@ namespace Jeu_de_combat
         {
             Fade();
 
+            SoundManager.Play("bg_fight.mp3", true);
             FloorAnim(); // Sol qui arrive
 
             for (int i = 10; i >= 0; i--) // Apparition des joueurs
@@ -192,14 +194,15 @@ namespace Jeu_de_combat
             {
                 StringToGrid(go, 12, 1-i, gridTextC, 0, -1);
                 PrintGrid();
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
+            SoundManager.Play("win.mp3");
             Thread.Sleep(500);
             for (int i = 5; i >= 0; i--)
             {
                 StringToGrid(go, 12, -5 + i, gridTextC, 0, 1);
                 PrintGrid();
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
         }
 
@@ -218,13 +221,13 @@ namespace Jeu_de_combat
                     if (text != _defaultText)
                     {
                         text = texts[0];
-                        PrintText(0);
+                        PrintText(text, 0);
                     }
                 }
                 else
                 {
                     text = texts[_buttonIndex];
-                    PrintText(0);
+                    PrintText(text, 0);
                 }
 
                 Console.SetCursorPosition(0, Console.WindowTop);
@@ -247,7 +250,10 @@ namespace Jeu_de_combat
                 if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
                     Beber();
 
+                SoundManager.Play("arrow_key.mp3");
+
             } while (choice != ConsoleKey.Enter);
+            SoundManager.Play("selection.mp3");
 
             text = "";
             if (nextScene != "BEBER")
@@ -297,30 +303,23 @@ namespace Jeu_de_combat
         {
             switch(source)
             {
-                case Damager: BulletAnim(Damager.BulletSprite, source.IsLeft, source.SpriteColorInstance); break;
-                case Healer: BulletAnim(Healer.BulletSprite, source.IsLeft, source.SpriteColorInstance); break;
+                case Damager: BulletAnim(Damager.BulletSprite, source.IsLeft, source.SpriteColorInstance, "fire.mp3"); break;
+                case Healer: BulletAnim(Healer.BulletSprite, source.IsLeft, source.SpriteColorInstance, "spell.mp3"); break;
                 case Tank: TankAttackAnim(source.IsLeft, Tank.SpriteColor); break;
             }
         }
 
         public static void DamagerSpecialAnim(bool lookRight, int dam)
         {
-            int startX = charLeft + 7;
-            if (!lookRight)
-                startX = charRight - 1;
-
             // Le pistolet s'agrandit d'autant de dégats reçus
-            string rageBullet = new string('=', dam);
-            rageBullet += '>';
+            string rageBullet = lookRight ? "=>" : "<=";
 
             // OU tire autant de balles que de dégâts reçus
             for (int i = 0; i < dam; i++)
             {
-                BulletAnim("=>", true, Damager.ColorSpecial, 7 / (i + 1));
+                BulletAnim(rageBullet, lookRight, Damager.ColorSpecial, "damager_ulti.mp3");
                 Thread.Sleep(100);
             }
-            //StringToGrid(rageBullet, startX, 2, damCspecial);
-            //BulletAnim(rageBullet, true, damCspecial);
         }
 
         public static void HealerSpecialAnim(bool lookRight)
@@ -336,6 +335,7 @@ namespace Jeu_de_combat
             }
 
             // Créer la bulle et la faire déplacer de 4 sur la droite
+            SoundManager.Play("spell.mp3");
             for (int i = 0; i < 4; i++)
             {
                 StringToGrid(Healer.BulletSprite, startX + i * s, 2, Healer.SpriteColor, -Math.Sign(i) * s, 0);
@@ -352,6 +352,7 @@ namespace Jeu_de_combat
                 PrintGrid();
                 Thread.Sleep(2);
             }
+            SoundManager.Play("spark.mp3");
 
             // La bulle se transforme en point de vie 
             StringToGrid(lifePoint, startX + 3 * s, 2, lifeC);
@@ -384,7 +385,6 @@ namespace Jeu_de_combat
                 Thread.Sleep(80);
             }
             // Mettre à jour les points de vie
-            PrintText();
         }
 
         public static void TankSpecialAnim(bool lookRight, int health)
@@ -420,6 +420,7 @@ namespace Jeu_de_combat
 
             // Le point de vie se consume et offre sa force au tank (animation)
             string[] trans = ["|", "/", "-", "\\", "+"];
+            SoundManager.Play("spark.mp3");
             for (int i = 0; i < 15; i++)
             {
                 StringToGrid(trans[i % trans.Length], startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC);
@@ -435,7 +436,7 @@ namespace Jeu_de_combat
             TankAttackAnim(lookRight, Tank.SpriteColorSpecial);
         }
 
-        public static void BulletAnim(string bul, bool lookRight, ConsoleColor color, int delay = 7)
+        public static void BulletAnim(string bul, bool lookRight, ConsoleColor color, string sound, int delay = 7)
         {
             int startX = charLeft + 7;
             int tarX = charRight - 1 - bul.Length;
@@ -447,7 +448,7 @@ namespace Jeu_de_combat
             }
             int s = Math.Sign(tarX - startX);
 
-
+            SoundManager.Play(sound);
             for (int x = 0; x <= max; x++)
             {
                 StringToGrid(bul, startX + x * s, 2, color, -s * Math.Sign(x), 0);
@@ -503,6 +504,7 @@ namespace Jeu_de_combat
             }
 
             // Le tank donne un coup d'épée
+            SoundManager.Play("hit.mp3");
             StringToGrid(attack + Tank.SpriteLegs[sprId], tarX, 2, spriteColor);
             PrintGrid();
             Thread.Sleep(300);
@@ -617,10 +619,14 @@ namespace Jeu_de_combat
 
         public static void DisplayEndGame(Character winner, Character loser) // Sah je pense c'est guez on peut enlever
         {
+            SoundManager.StopAllLoops();
+            int w = winner.IsLeft ? 1 : 2;  
+
             // Le joueur vaincu se retire de l'écran
+            SoundManager.Play("win.mp3");
             string loserSprite = loser.IsLeft ? loser.SpriteLeftInstance : loser.SpriteRightInstance;
             int startX = loser.IsLeft ? charLeft : charRight;
-            for(int i = 0; i < 10; i++)
+            for(int i = 0; i <= 10; i++)
             {
                 int s = loser.IsLeft ? -1 : 1;
                 StringToGrid(loserSprite, startX + i * s, 2, loser.SpriteColorInstance, -s, 0);
@@ -641,6 +647,9 @@ namespace Jeu_de_combat
                 PrintGrid();
                 Thread.Sleep(300);
             }
+
+            // Texte indiquant le gagnant
+            PrintText($"{winner.Name} (Player {w}) wins !");
 
             // Animation des confettis qui arrivent 
             for (int i = 5; i >= 0; i--)
@@ -675,12 +684,9 @@ namespace Jeu_de_combat
             StringToGrid(new string(lifePoint[0], xMax/2), 2, 1, lifeC,0,0);
             StringToGrid(new string(lifePoint[0], xMax/2), xMax/2, 1, lifeC,0,0);
 
-            if (left >= 0 && right >= 0)
-            {
-                StringToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
-                StringToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
-                PrintGrid();
-            }
+            StringToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
+            StringToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
+            PrintGrid();
         }
 
         private static void PrintGrid()
@@ -709,6 +715,7 @@ namespace Jeu_de_combat
             List<int> spaces = new List<int>();
             switch (butsText.Length)
             {
+                case 1: spaces = [25]; break;
                 case 2: spaces = [16, 34]; break;
                 case 3: spaces = [11, 25, 39]; break;
                 case 4: spaces = [8, 19, 29, 40]; break;
@@ -728,7 +735,7 @@ namespace Jeu_de_combat
             }
         }
 
-        public static void PrintText(int delay = 10) // Affiche le texte en fonction de la situation
+        public static void PrintText(string text, int delay = 10) // Affiche le texte en fonction de la situation
         {
             if(text != _actualText) // Efface le texte précédent si il est différent du nouveau
                 ClearScreen(false, false, true);
@@ -806,6 +813,8 @@ namespace Jeu_de_combat
         public static void DisplayCredits()
         {
             Fade();
+
+            SoundManager.Play("credits.mp3", true);
             string c = "\"MONOMACHIA\""
                 + "-A P5INJ PRODUCTION"
                 + "-Gameplay Programmer : Adam Adhar"
@@ -834,8 +843,8 @@ namespace Jeu_de_combat
         private static void Beber() // Un petit easter egg en l'hommage de notre promo et de sa mascotte !
         {
             SoundManager.StopAllLoops();
-            SoundManager.Play("credits.mp3", true);
             Fade(true, true);
+            SoundManager.Play("credits.mp3", true);
             ConsoleColor beberC = ConsoleColor.DarkYellow;
             string beberText = "oo  ooo oo  ooo ooo"
                 + "\no o o   o o o   o o"
@@ -867,6 +876,8 @@ namespace Jeu_de_combat
                 Thread.Sleep(300);
             }
 
+            Thread.Sleep(1000);
+            Selector(["Beber"], ["Beber."]);
             Environment.Exit(0);
         }
     }
