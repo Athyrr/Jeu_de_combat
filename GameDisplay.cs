@@ -99,7 +99,7 @@ namespace Jeu_de_combat
 
         // Variables
         static int _buttonIndex = 1;
-        static string _text = string.Empty;
+        public static string text = string.Empty;
         static string _actualText = string.Empty;
         public static string DisplayMenu()
         {
@@ -182,11 +182,11 @@ namespace Jeu_de_combat
                 Thread.Sleep(50);
             }
 
-            string go = "FFFFF I GGGGG H   H TTTTT I"
-                   + "\nF        G     H   H   T   I"
-                   + "\nFFF   I  G  GG HHHHH   T   I"
-                   + "\nF     I  G   G H   H   T    "
-                   + "\nF     I  GGGGG H   H   T   O";
+            string go = "FFFFF I  GGGGG H   H TTTTT I"
+                   +  "\nF        G     H   H   T   I"
+                   +  "\nFFF   I  G  GG HHHHH   T   I"
+                   +  "\nF     I  G   G H   H   T    "
+                   +  "\nF     I  GGGGG H   H   T   O";
 
             for (int i = 5; i >= 0; i--)
             {
@@ -215,15 +215,15 @@ namespace Jeu_de_combat
                 PrintButs(butsText);
                 if (texts.Length <= 1)
                 {
-                    if (_text != _defaultText)
+                    if (text != _defaultText)
                     {
-                        _text = texts[0];
+                        text = texts[0];
                         PrintText(0);
                     }
                 }
                 else
                 {
-                    _text = texts[_buttonIndex];
+                    text = texts[_buttonIndex];
                     PrintText(0);
                 }
 
@@ -249,7 +249,7 @@ namespace Jeu_de_combat
 
             } while (choice != ConsoleKey.Enter);
 
-            _text = "";
+            text = "";
             if (nextScene != "BEBER")
                 nextScene = butsText[_buttonIndex];
             return nextScene;
@@ -615,18 +615,32 @@ namespace Jeu_de_combat
 
         }
 
-        public static void DisplayEndGame(Character source) // Sah je pense c'est guez on peut enlever
+        public static void DisplayEndGame(Character winner, Character loser) // Sah je pense c'est guez on peut enlever
         {
+            // Le joueur vaincu se retire de l'écran
+            string loserSprite = loser.IsLeft ? loser.SpriteLeftInstance : loser.SpriteRightInstance;
+            int startX = loser.IsLeft ? charLeft : charRight;
+            for(int i = 0; i < 10; i++)
+            {
+                int s = loser.IsLeft ? -1 : 1;
+                StringToGrid(loserSprite, startX + i * s, 2, loser.SpriteColorInstance, -s, 0);
+                PrintGrid();
+                Thread.Sleep(50);
+            }
+
+            Fade(true, true, 50);
             string c1 = "` , ` , ` , ` , ` ,";
             string c2 = " ` , ` , ` , ` , ` ";
             string confets1 = $"{c1}\n{c2}\n{c1}\n{c2}\n{c1}\n{c2}";
             string confets2 = $"{c2}\n{c1}\n{c2}\n{c1}\n{c2}\n{c1}";
 
-            // Effacer les joueurs
-            ClearScreen();
-
             // Placer le perso gagant au centre
-            StringToGrid(source.SpriteLeftInstance, charLeft + 17, 2, source.SpriteColorInstance);
+            for(int i = yMax; i >= 0; i--)
+            {
+                StringToGrid(winner.SpriteLeftInstance, charLeft + 17, 2 + i, winner.SpriteColorInstance, 0, 1);
+                PrintGrid();
+                Thread.Sleep(300);
+            }
 
             // Animation des confettis qui arrivent 
             for (int i = 5; i >= 0; i--)
@@ -714,16 +728,16 @@ namespace Jeu_de_combat
             }
         }
 
-        static void PrintText(int delay = 10) // Affiche le texte en fonction de la situation
+        public static void PrintText(int delay = 10) // Affiche le texte en fonction de la situation
         {
-            if(_text != _actualText) // Efface le texte précédent si il est différent du nouveau
+            if(text != _actualText) // Efface le texte précédent si il est différent du nouveau
                 ClearScreen(false, false, true);
 
             Console.SetCursorPosition(0, textTop);
-            Text(_text, delay); // Écrit le texte avec un délai d'apparition des caractères pour créer un effet dialogue
+            Text(text, delay); // Écrit le texte avec un délai d'apparition des caractères pour créer un effet dialogue
         }
 
-        private static void Text(string text, int delay = 10, bool debug = false)
+        public static void Text(string text, int delay = 10, bool debug = false)
         {
             _actualText = text;
             if (debug)
@@ -798,7 +812,7 @@ namespace Jeu_de_combat
             + "-Sound Designer : Elliot Nedellec"
             + "-Graphics Implementation : Marius Boulandet"
             + "-Special thanks : Beber"
-            + "-2024©"
+            + "-2024 ©"
             + "---Thanks for playing <3";
             string credits = "";
             foreach (string s in c.Split('-'))

@@ -20,7 +20,7 @@
         private int _maxHealth = 4;
 
         ///<inheritdoc cref="Character.SpecialDescription"/>
-        private string _specialDescription = "Heal : Heal 2 life points.";
+        private string _specialDescription = $"Heal : Heal 2 life points.";
 
 
         ///<inheritdoc cref="Character.SpriteLeft"/>
