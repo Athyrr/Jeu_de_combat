@@ -122,6 +122,8 @@
 
                     case GameState.Game:
 
+                        SoundManager.Stop("bg_menu.mp3");
+                        SoundManager.Play("bg_fight.mp3");
                         GameDisplay.DisplayFight(_player1, _player2);
                         Game();
                         _isRunning = false;
@@ -130,6 +132,7 @@
                         break;
 
                     case GameState.Credit:
+                        //arrêter musique en cours
                         SoundManager.Play("credits.mp3", true);
                         GameDisplay.DisplayCredits();
 
@@ -424,7 +427,7 @@
         }
 
         /// <summary>
-        /// IA behaviour depending on current diffculty
+        /// AI behaviour depending on current difficulty
         /// </summary>
         public static string AIBehavior(Character source, string[] choices)
         {
