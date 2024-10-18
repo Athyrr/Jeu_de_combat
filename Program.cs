@@ -45,7 +45,7 @@ namespace Jeu_de_combat
         /// <summary>
         /// The difficulty of the game
         /// </summary>
-        private static int difficulty = 2;
+        private static List<string> difficulty = new List<string>();
 
         public static void Main(string[] args)
         {
@@ -53,6 +53,7 @@ namespace Jeu_de_combat
             SoundManager.Init();
 
             GameState state = GameState.Intro;
+            int chooseCharacterId = 0; // Pour indiquer la bonne sélection lors de la sélection de personnage pour le joueur et les IA
 
             while (true)
             {
@@ -60,6 +61,7 @@ namespace Jeu_de_combat
                 {
                     case GameState.Intro:
                         SoundManager.StopAllLoops();
+                        chooseCharacterId = 0;
                         string menu = GameDisplay.DisplayMenu();
 
                         switch (menu)
@@ -89,33 +91,62 @@ namespace Jeu_de_combat
                         string mode = GameDisplay.DisplayGameModeSelection();
                         _wantAI = GameModeSelection(mode);
 
-                        state = GameState.PlayerSelection;
+                        if (_wantAI)
+                        {
+                            chooseCharacterId = 1;
+                            state = GameState.AISelection;
+                        }
+                        else 
+                            state = GameState.CharacterSelection;
                         break;
 
-                    case GameState.PlayerSelection:
-
-                        Random rand = new Random();
+                    case GameState.CharacterSelection:
                         Console.WriteLine();
                         string characterString = "";
                         string[] characters = ["Damager", "Healer", "Tank"];
+                        string[] texts =
+                        {
+                            "Choose your character :",
+                            "Choose IA character :",
+                            "Choose IA character :"
+                        };
+                        if (_wantAI && chooseCharacterId==0)
+                            chooseCharacterId=1;
 
-                        if (!_wantAI)
-                            characterString = GameDisplay.DisplayCharacterSelection();
+                        characterString = GameDisplay.DisplayCharacterSelection(texts[chooseCharacterId]);
 
-                        if (characterString == "Random")
-                            characterString = characters[rand.Next(0, characters.Length)];
+                        if(chooseCharacterId<=1) // Choix du joueur ou pour l'IA
+                        {
+                            _player1 = PlayerSelection(characterString);
+                            _player1.IsIA = chooseCharacterId==1;
+                            _player1.IsLeft = true;
+                        }
+                        else // Choix pour l'IA
+                        {
+                            _player2 = PlayerSelection(characterString);
+                            _player2.IsIA = true;
+                            _player2.IsLeft = false;
+                        }
 
-                        _player1 = PlayerSelection(_wantAI, characterString);
-                        _player1.IsIA = _wantAI;
-                        _player1.IsLeft = true;
+                        if (chooseCharacterId == 0)
+                        {
+                            state = GameState.AISelection;
+                            chooseCharacterId = 2;
+                        }
+                        else if (chooseCharacterId == 1)
+                        {
+                            state = GameState.AISelection;
+                            chooseCharacterId = 2;
+                        }
+                        else 
+                            state = GameState.Game;
 
-                        if (!_wantAI) _wantAI = true;
+                        break;
 
-                        _player2 = PlayerSelection(_wantAI, characterString);
-                        _player2.IsIA = _wantAI;
-                        _player2.IsLeft = false;
+                    case GameState.AISelection:
+                        difficulty.Add(GameDisplay.DisplayIALevelSelection(_wantAI));
 
-                        state = GameState.Game;
+                        state = GameState.CharacterSelection;
                         break;
 
                     case GameState.Game:
@@ -153,7 +184,7 @@ namespace Jeu_de_combat
         /// </summary>
         private static bool GameModeSelection(string mode)
         {
-            return mode == "AI vs AI" ? true : false;
+            return mode == "AI vs AI";
         }
 
 
@@ -162,22 +193,15 @@ namespace Jeu_de_combat
         /// </summary>
         /// <param name="wantIA"></param>
         /// <returns>Returns the index of the selected character archetype.</returns>
-        private static Character PlayerSelection(bool wantIA, string characterString)
+        private static Character PlayerSelection(string characterString)
         {
+            Random rand = new Random();
             Dictionary<int, Character> indexCharacters = new Dictionary<int, Character>
             {
                 { 1, new Damager() },
                 { 2, new Healer() },
                 { 3, new Tank() }
             };
-
-            if (wantIA)
-            {
-                Random rand = new Random();
-                int choice = rand.Next(1, 4);
-
-                return indexCharacters[choice];
-            }
 
             switch (characterString)
             {
@@ -192,7 +216,8 @@ namespace Jeu_de_combat
                 case nameof(Tank):
                     return new Tank();
 
-                //Case 4 : other character
+                case "Random":
+                    return indexCharacters[rand.Next(1, 4)];
 
                 default:
                     Console.WriteLine("Failed select player! Player input is invalid.");
@@ -205,10 +230,7 @@ namespace Jeu_de_combat
         /// </summary>
         private static void Game()
         {
-            // a enlever plus tard maybe
             Random rand = new Random();
-            //difficulty = rand.Next(1, 4);
-            difficulty = 1;
 
             while (!_stopFighting)
             {
@@ -216,7 +238,7 @@ namespace Jeu_de_combat
                 AttackSelection(_player2, _player1);
 
                 GameDisplay.ClearScreen(false);
-                if(difficulty==3)
+                if (difficulty[0] =="Zeus")
                 {
                     _defendProcesses.Reverse();
                     _attackProcesses.Reverse();
@@ -433,13 +455,14 @@ namespace Jeu_de_combat
         {
             Random rand = new Random();
             string choice = choices[rand.Next(0, choices.Count())]; // Choix aléatoire prédifini
+            int which = source.IsLeft ? 1 : 0;
 
-            switch (difficulty)
+            switch (difficulty[which])
             {
-                case 1: // L'IA effectuera un choix aléatoire
+                case "Tyche": // L'IA effectuera un choix aléatoire
                     return choice;
 
-                case 2: // L'IA effectuera le meilleur choix possible selon sa situation actuelle 
+                case "Athena": // L'IA effectuera le meilleur choix possible selon sa situation actuelle 
                     switch (source.CharacterClass)
                     {
                         case CharacterClasses.Damager: // Si l'IA est un Damager
@@ -489,7 +512,7 @@ namespace Jeu_de_combat
                     }
                     break;
 
-                case 3: // L'IA jouera avant nous et effectuera le meilleur choix possible en étudiant toutes les situations possibles grâce à une simulation sur 2 tours
+                case "Zeus": // L'IA jouera avant nous et effectuera le meilleur choix possible en étudiant toutes les situations possibles grâce à une simulation sur 2 tours
                     string playerChoice = target.previousChoices[target.previousChoices.Count-1]; // L'IA Zeus, omnisciente, récupère le choix du joueur.
                     if(playerChoice=="Special")
                         playerChoice = target.Name;
