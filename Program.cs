@@ -50,8 +50,6 @@
             GameDisplay.Init();
             SoundManager.Init();
 
-
-
             GameState state = GameState.Intro;
 
             while (true)
@@ -264,7 +262,7 @@
                     choicesText.RemoveAt(id);
                 }
 
-         
+
                 choice = GameDisplay.Selector(choices.ToArray(), choicesText.ToArray());
                 if (choice == "Attack")
                     source.previousChoice = "";
@@ -364,7 +362,7 @@
                 if (process.IsSpecial)
                 {
                     string whichPlayer = process.Source.IsLeft ? "Player 1" : "Player 2";
-                    GameDisplay.text = $"{process.Source.Name} ({whichPlayer}) uses his special !";
+                    GameDisplay.text = $"({whichPlayer}) {process.Source.Name} uses his special !";
                     GameDisplay.PrintText();
 
                     process.Source.SpecialAttack(process.Target);
@@ -372,7 +370,7 @@
                 else
                 {
                     string whichPlayer = process.Source.IsLeft ? "Player 1" : "Player 2";
-                    GameDisplay.text = $"{process.Source.Name} ({whichPlayer}) attacks !";
+                    GameDisplay.text = $"({whichPlayer}) {process.Source.Name} attacks !";
                     GameDisplay.PrintText();
 
                     GameDisplay.ChooseAttack(process.Source);
@@ -434,20 +432,6 @@
                 if (EndGame(_player1, _player2))
                     return;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns>Returns an int that represent the class of the character</returns>
-        public static int CharacterType(Character source)
-        {
-            if (source is Damager)
-                return 1;
-            else if (source is Healer)
-                return 2;
-            else return 3;
         }
 
         /// <summary>
