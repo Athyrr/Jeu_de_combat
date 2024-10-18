@@ -158,7 +158,7 @@ namespace Jeu_de_combat
             // Afficher Bouttons et Texte associé 
             string[] t =
             [
-                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages. Damager still takes damages.",
+                "Damager\nLife points : ***, Strength : ++\nRage : Return back received damages doubled. Damager still takes damages.",
                 "Healer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
                 "Tank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
                 "Choose a character randomly."
@@ -192,14 +192,14 @@ namespace Jeu_de_combat
             {
                 StringToGrid(go, 12, 1-i, gridTextC, 0, -1);
                 PrintGrid();
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
             Thread.Sleep(500);
             for (int i = 5; i >= 0; i--)
             {
                 StringToGrid(go, 12, -5 + i, gridTextC, 0, 1);
                 PrintGrid();
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
         }
 
@@ -218,13 +218,13 @@ namespace Jeu_de_combat
                     if (text != _defaultText)
                     {
                         text = texts[0];
-                        PrintText(0);
+                        PrintText(text, 0);
                     }
                 }
                 else
                 {
                     text = texts[_buttonIndex];
-                    PrintText(0);
+                    PrintText(text, 0);
                 }
 
                 Console.SetCursorPosition(0, Console.WindowTop);
@@ -305,22 +305,15 @@ namespace Jeu_de_combat
 
         public static void DamagerSpecialAnim(bool lookRight, int dam)
         {
-            int startX = charLeft + 7;
-            if (!lookRight)
-                startX = charRight - 1;
-
             // Le pistolet s'agrandit d'autant de dégats reçus
-            string rageBullet = new string('=', dam);
-            rageBullet += '>';
+            string rageBullet = lookRight ? "=>" : "<=";
 
             // OU tire autant de balles que de dégâts reçus
             for (int i = 0; i < dam; i++)
             {
-                BulletAnim("=>", true, Damager.ColorSpecial, 7 / (i + 1));
+                BulletAnim(rageBullet, lookRight, Damager.ColorSpecial, 7 / (i + 1));
                 Thread.Sleep(100);
             }
-            //StringToGrid(rageBullet, startX, 2, damCspecial);
-            //BulletAnim(rageBullet, true, damCspecial);
         }
 
         public static void HealerSpecialAnim(bool lookRight)
@@ -384,7 +377,6 @@ namespace Jeu_de_combat
                 Thread.Sleep(80);
             }
             // Mettre à jour les points de vie
-            PrintText();
         }
 
         public static void TankSpecialAnim(bool lookRight, int health)
@@ -617,10 +609,13 @@ namespace Jeu_de_combat
 
         public static void DisplayEndGame(Character winner, Character loser) // Sah je pense c'est guez on peut enlever
         {
+            int w = winner.IsLeft ? 1 : 2;  
+            PrintText($"{winner.Name} (Player {w}) wins !");
+
             // Le joueur vaincu se retire de l'écran
             string loserSprite = loser.IsLeft ? loser.SpriteLeftInstance : loser.SpriteRightInstance;
             int startX = loser.IsLeft ? charLeft : charRight;
-            for(int i = 0; i < 10; i++)
+            for(int i = 0; i <= 10; i++)
             {
                 int s = loser.IsLeft ? -1 : 1;
                 StringToGrid(loserSprite, startX + i * s, 2, loser.SpriteColorInstance, -s, 0);
@@ -675,12 +670,9 @@ namespace Jeu_de_combat
             StringToGrid(new string(lifePoint[0], xMax/2), 2, 1, lifeC,0,0);
             StringToGrid(new string(lifePoint[0], xMax/2), xMax/2, 1, lifeC,0,0);
 
-            if (left >= 0 && right >= 0)
-            {
-                StringToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
-                StringToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
-                PrintGrid();
-            }
+            StringToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
+            StringToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
+            PrintGrid();
         }
 
         private static void PrintGrid()
@@ -728,7 +720,7 @@ namespace Jeu_de_combat
             }
         }
 
-        public static void PrintText(int delay = 10) // Affiche le texte en fonction de la situation
+        public static void PrintText(string text, int delay = 10) // Affiche le texte en fonction de la situation
         {
             if(text != _actualText) // Efface le texte précédent si il est différent du nouveau
                 ClearScreen(false, false, true);
