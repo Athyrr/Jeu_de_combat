@@ -5,7 +5,7 @@ namespace Jeu_de_combat
     internal class Program()
     {
         ///<inheritdoc cref="GameDisplay"/>
-        public GameDisplay _displayModule = new GameDisplay();
+        //public GameDisplay _displayModule = new GameDisplay();
 
         /// <summary>
         /// Tracks <see cref="AttackProcess"/> datas. 
@@ -26,11 +26,6 @@ namespace Jeu_de_combat
         /// The player 2.
         /// </summary>
         private static Character _player2 = null;
-
-        /// <summary>
-        /// Is the game running ?
-        /// </summary>
-        private static bool _isRunning = false;
 
         /// <summary>
         /// Is the game stopped ?
@@ -62,6 +57,8 @@ namespace Jeu_de_combat
                     case GameState.Intro:
                         SoundManager.StopAllLoops();
                         chooseCharacterId = 0;
+                        _stopFighting = false;
+                        difficulty.Clear();
                         string menu = GameDisplay.DisplayMenu();
 
                         switch (menu)
@@ -430,8 +427,8 @@ namespace Jeu_de_combat
             if (_player1 is Damager damager1 && damager1.SpecialEffectEnabled)
             {
                 int reveivedDamages = damager1.DamagesTaken;
-                GameDisplay.DamagerSpecialAnim(true, reveivedDamages*2);
-                _player1.Attack(_player2, reveivedDamages*2);
+                GameDisplay.DamagerSpecialAnim(true, reveivedDamages);
+                _player1.Attack(_player2, reveivedDamages);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -440,8 +437,8 @@ namespace Jeu_de_combat
             if (_player2 is Damager damager2 && damager2.SpecialEffectEnabled)
             {
                 int reveivedDamages = damager2.DamagesTaken;
-                GameDisplay.DamagerSpecialAnim(false, reveivedDamages*2);
-                _player2.Attack(_player1, reveivedDamages*2);
+                GameDisplay.DamagerSpecialAnim(false, reveivedDamages);
+                _player2.Attack(_player1, reveivedDamages);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -517,6 +514,9 @@ namespace Jeu_de_combat
                     if(playerChoice=="Special")
                         playerChoice = target.Name;
 
+                    List<string> zeusFDP = choices.ToList(); zeusFDP.Remove("Special");
+                    choice = zeusFDP[rand.Next(0,zeusFDP.Count)];
+
                     switch(playerChoice)
                     {
                         case "Defend": // Le joueur va se défendre
@@ -547,9 +547,9 @@ namespace Jeu_de_combat
                             if (choices.Contains("Special"))
                                 // Si l'IA est un Damager/Tank et que son spécial va tuer le joueur
                                 // OU que l'IA est un Healer qui ne peut pas se défendre mais doit se soigner pour éviter la mort
-                                if (source is Damager && source.Health > target.Strength && target.Health <= target.Strength * 2
-                                || source is Tank && source.Health > 1 && target.Health <= 2
-                                || source is Healer && !choices.Contains("Defend") && source.Health <= target.Strength) 
+                                if ((source is Damager && source.Health > target.Strength && target.Health <= target.Strength * 2)
+                                || (source is Tank && source.Health > 1 && target.Health <= 2)
+                                || (source is Healer && !choices.Contains("Defend") && source.Health <= target.Strength))
                                     return "Special";
 
 

@@ -20,7 +20,7 @@
         private int _maxHealth = 3;
 
         /// <inheritdoc cref="Character.SpecialDescription"/>
-        private string _specialDescription = "Rage : Return back received damages doubled. Damager still takes damages.";
+        private string _specialDescription = "Rage : Return back received damages. Damager still takes damages.";
        
         /// <summary>
         /// Was the Damager special attack used?

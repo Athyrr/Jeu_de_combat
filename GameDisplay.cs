@@ -9,125 +9,183 @@ namespace Jeu_de_combat
     /// </summary>
     public class GameDisplay
     {
-
-        // Code trouvé sur internet pour enlever le mode d'édition rapide, qui fait que si l'utilisateur appuie sur la souris, le programme se met en pause
-        private const uint ENABLE_QUICK_EDIT = 0x0040; // Mode QuickEdit
-        private const uint ENABLE_EXTENDED_FLAGS = 0x0080; // Permet de changer les modes
+        #region Remove QuickEdit Mode Data
+        // Code found on the Internet to remove the Visual Studio's QuickEdit Mode, which stops the program if the player clicks on the window with his mouse.
+        private const uint ENABLE_QUICK_EDIT = 0x0040; 
+        private const uint ENABLE_EXTENDED_FLAGS = 0x0080; 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetStdHandle(int nStdHandle);
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+        #endregion
 
-        // Data 
-        const int xMax = 51; // Limite de la grille en longueur
-        const int yMax = 7;  // Limite de la grille en hauteur
+        #region Data
+        /// <summary>
+        /// Grid height
+        /// </summary>
+        const int xMax = 51; 
+        /// <summary>
+        /// Grid width 
+        /// </summary>
+        const int yMax = 7;  
 
-        static char[,] _grid = new char[xMax + 1, yMax + 1]; // Grille représentant l'écran de jeu, chaque élément est un "pixel" qui prend en valeur un caractère (char)
-        static ConsoleColor[,] _colorGrid = new ConsoleColor[xMax + 1, yMax + 1]; // Grille représentant l'écran de jeu, chaque élément représente la couleur du "pixel"
+        /// <summary>
+        /// Grid where each char element represents the screen game "pixels"
+        /// </summary>
+        static char[,] _grid = new char[xMax + 1, yMax + 1];
+        /// <summary>
+        /// Grid where each ConsoleColor element represents each pixels color
+        /// </summary>
+        static ConsoleColor[,] _colorGrid = new ConsoleColor[xMax + 1, yMax + 1];
 
-        const int gridLeft = 10;      // Colonne assignée pour afficher l'écran de jeu (grille), la ligne étant la première (0)
-        const int butTop = yMax + 2;  // Ligne assignée pour afficher les boutons, la colonne étant la première (0)
-        const int textTop = yMax + 5; // Ligne assignée pour afficher le texte, la colonne étant la première (0)
-        const int charLeft = 4; // Emplacement du joueur à gauche
-        const int charRight = 41; // Emplacement du joueur à droite
+        /// <summary>
+        /// Assigned column to print the game screen.
+        /// </summary>
+        const int gridLeft = 10;
+        /// <summary>
+        /// Assigned line to print the buttons
+        /// </summary>
+        const int butTop = yMax + 2;
+        /// <summary>
+        /// Assigned line to print the text
+        /// </summary>
+        const int textTop = yMax + 5;
+        /// <summary>
+        /// Assigned line to print the left player
+        /// </summary>
+        const int charLeft = 4;
+        /// <summary>
+        /// Assigned line to print the right player
+        /// </summary>
+        const int charRight = 41;
 
+        /// <summary>
+        /// Default text which appears when the buttons don't have a specified text
+        /// </summary>
         const string _defaultText = "Choose with arrows and enter the wanted action";
 
-        // Sprites
+        /// <summary>
+        /// Actual selected button index
+        /// </summary>
+        static int _buttonIndex = 0;
+        /// <summary>
+        /// Actual text printed
+        /// </summary>
+        static string _actualText = string.Empty;
+        #endregion
+
+        #region Sprites
+        /// <summary>
+        /// White color (default)
+        /// </summary>
         const ConsoleColor defaultColor = ConsoleColor.White;
+        /// <summary>
+        /// Gray color (default) for elements inside the game screen
+        /// </summary>
         const ConsoleColor gridTextC = ConsoleColor.Gray;
+        
 
-        static string _line = new string('-', xMax);
-        string underLine = new string('_', xMax);
-        static string _floor = new string('=', xMax / 2);
-
-        const string defense = "|\n|\n|\n|"; // Action Défendre
-        const string vs = "V   V  SSSSS"
-                + "\nV   V  S    "
-                + "\n V V   SSSSS"
-                + "\n V V       S"
-                + "\n  V    SSSSS";
-
-        // Sol
-        const ConsoleColor floorC = ConsoleColor.DarkGreen;
-        const int floorTop = yMax - 1;
-
-        // Vie
+        /// <summary>
+        /// Life point sprite
+        /// </summary>
         const string lifePoint = "*";
+        /// <summary>
+        /// Life point sprite color
+        /// </summary>
         const ConsoleColor lifeC = ConsoleColor.Red;
 
-        // Création du sprite de la bordure
-        static string _emptyGridString = ""; // Sprit
+        /// <summary>
+        /// Grid borders sprite
+        /// </summary>
+        static string _gridBorders = "";
+        #endregion
 
+        /// <summary>
+        /// Initialisation of the GameDisplay module
+        /// </summary>
         public static void Init()
         {
-            // Code trouvé sur internet pour empêcher la souris d'intérragir 
+            #region Remove QuickEdit Mode 
             IntPtr consoleHandle = GetStdHandle(-10);
             uint consoleMode = 0;
             consoleMode &= ~ENABLE_QUICK_EDIT;
             consoleMode |= ENABLE_EXTENDED_FLAGS;
             SetConsoleMode(consoleHandle, consoleMode);
+            #endregion
 
-            // Initialisation de la fenêtre de la console
+            #region Application Window Initialisation
             Console.SetWindowSize(72, 20);
-            Console.SetBufferSize(72, 20);
-            Console.Title = "Monomachia";
-            Console.CursorVisible = false;
+            //Console.SetBufferSize(72, 20); 
+            Console.Title = "Monomachia"; // Rename the application window
+            Console.CursorVisible = false; // Remove the cursor visibility
+            #endregion
 
-            // Création et intégration de la bordure de la grille
+            #region Grid Borders Sprite construction by code
             for (int y = 0; y <= yMax; y++)
             {
                 for (int x = 0; x <= xMax; x++)
                 {
                     if ((y == 0 || y == yMax) && (x == 0 || x == xMax))
-                        _emptyGridString += "+";
+                        _gridBorders += "+";
                     else if (y == 0 || y == yMax)
-                        _emptyGridString += '-';
+                        _gridBorders += '-';
                     else if (x == 0 || x == xMax)
-                        _emptyGridString += "|";
+                        _gridBorders += "|";
                     else if (x < xMax)
-                        _emptyGridString += ' ';
+                        _gridBorders += ' ';
 
                     _colorGrid[x, y] = defaultColor;
                 }
 
                 if (y < _grid.GetLength(1) - 1)
-                    _emptyGridString += '\n';
+                    _gridBorders += '\n';
             }
-            StringToGrid(_emptyGridString, 0, 0);
+            StringToGrid(_gridBorders, 0, 0);
+            #endregion
         }
 
-        // Variables
-        static int _buttonIndex = 1;
-        public static string text = string.Empty;
-        static string _actualText = string.Empty;
+        /// <summary>
+        /// Menu selection 
+        /// </summary>
+        /// <returns>Selected button choice</returns>
         public static string DisplayMenu()
         {
-            Fade(false, true);
-
-            string title = "MMMM OOOO N  N OOOO MMMM  AA  CCCC H  H  I   AA " +
+            // Title text sprite
+            string title = "MMMM OOOO N  N OOOO MMMM  AA  CCCC H  H  /   AA " +
                          "\nM  M O  O NN N O  O M  M A  A C    HHHH     A  A" +
                          "\nM  M O  O N NN O  O M  M AAAA C    HHHH  I  AAAA" +
                          "\nM  M OOOO N  N OOOO M  M A  A CCCC H  H  I  A  A";
-            char t = '*';
-            title = title.Replace('M', t); title = title.Replace('O', t); title = title.Replace('N', t);
-            title = title.Replace('A', t); title = title.Replace('C', t); title = title.Replace('H', t); title = title.Replace('I', t);
 
-            SoundManager.Play("bg_menu.mp3", true);
+            Fade(false, true);
+            SoundManager.Play("bg_menu.mp3", true); // Play the menu theme
+
+            // Title text animation
             for (int y = yMax + 1; y > 1; y--)
             {
                 StringToGrid(title, 2, y, gridTextC, 0, 1);
                 PrintGrid();
-                //Thread.Sleep(0);
-                Thread.Sleep(300);
+                Thread.Sleep(250);
             }
-            return Selector(["Quit", "Play", "Credits"], [_defaultText]);
+            return Selector(["Quit", "Play", "Credits"], [_defaultText]); // Buttons set up
         }
 
+        /// <summary>
+        /// Gamemode selection
+        /// </summary>
+        /// <returns> Selected button choice </returns>
         public static string DisplayGameModeSelection()
         {
+            // "VS" text sprite
+            string vs = "V   V  SSSSS"
+                + "\nV   V  S    "
+                + "\n V V   SSSSS"
+                + "\n V V       S"
+                + "\n  V    SSSSS";
+
             Fade();
             FloorAnim();
+
+            // Arrival animation of two characters, the VS text
             for (int i = 10; i > 0; i--)
             {
                 StringToGrid(Damager.SpriteLeft, charLeft - i, 2, Damager.SpriteColor, 1, 0);
@@ -137,15 +195,20 @@ namespace Jeu_de_combat
                 Thread.Sleep(100);
             }
 
-            // Boutons et texte
-            return Selector(["Player vs AI", "AI vs AI"], [_defaultText]);
+            return Selector(["Player vs AI", "AI vs AI"], [_defaultText]); // Buttons set up
         }
 
+        /// <summary>
+        /// Character selection
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns> Selected button choice </returns>
         public static string DisplayCharacterSelection(string text)
         {
+            string randomSprite = " ????? \n     ? \n   ??? \n   ?   \n"; // Interrogation point sprite 
             Fade();
-            string randomSprite = " ????? \n     ? \n   ??? \n   ?   \n";
-            // Afficher sprites sur grid
+
+            // Animation of the three characters and the random choice sprites 
             for (int y = yMax + 1; y >= 2; y--)
             {
                 StringToGrid(Damager.SpriteLeft, 6, y, Damager.SpriteColor, 0, 1);
@@ -155,43 +218,53 @@ namespace Jeu_de_combat
                 PrintGrid();
                 Thread.Sleep(75);
             }
-            PrintGrid();
-            // Afficher Bouttons et Texte associé 
+
+            // Specified text buttons set up
             string[] t =
             [
-                $"{text}\nDamager\nLife points : ***, Strength : ++\nRage : Return back received damages doubled. Damager still takes damages.",
+                $"{text}\nDamager\nLife points : ***, Strength : ++\nRage : Return back received damages. Damager still takes damages.",
                 $"{text}\nHealer\nLife points : ****, Strength : +\nHeal : Heal 2 life points.",
                 $"{text}\nTank\nLife points : *****, Strength : +\nStrong Attack : Tank uses 1 life point to increase his strength by 1, then attacks. After his attack, his strength goes back to normal.",
                 $"{text}\nChoose a character randomly."
             ];
-            return Selector(["Damager", "Healer", "Tank","Random"], t);
+            return Selector(["Damager", "Healer", "Tank","Random"], t); // Buttons set up
         }
 
+        /// <summary>
+        /// AI Level selection
+        /// </summary>
+        /// <param name="AIvsAI"></param>
+        /// <returns></returns>
         public static string DisplayIALevelSelection(bool AIvsAI)
         {
-            Fade();
-
+            // Three levels sprite representation (inspired of greek mythological gods)
             string tyche = "   O   \n L/|\\  \n   |   \n  / \\  ";
             string athena = "\\ 8O   \n \\/|-0 \n  \\|   \n  / \\  ";
             string zeus = " / O   \n \\/|\\  \n / |   \n  / \\  ";
             string[] sprites = [tyche, athena, zeus];
-            string text = "Choose which IA you want to fight :";
             List<ConsoleColor> colors = [ConsoleColor.Cyan, ConsoleColor.DarkGreen, ConsoleColor.Yellow];
+
+            // Specified text buttons set up
+            string text = "Choose which IA you want to fight :";
             string[] buts = ["Tyche", "Athena", "Zeus"];
             List<string> texts = new List<string> {
                 $"{text}\nGoddess of luck, she'll bet everything on fate to win.",
                 $"{text}\nGoddess of strategy, she will provide a duel worthy of the name.",
                 $"{text}\nAbsolute God of Gods, this omniscient entity is faster and smarter than you, by far."
             };
-            if (AIvsAI) // On enlève le mode Zeus si on a du AI vs AI 
+
+            Fade();
+
+            // Remove the "Zeus" level if the gamemode is AI vs other AI
+            if (AIvsAI) 
             {
                 buts = ["Tyche", "Athena"];
                 sprites = [tyche, athena];
                 texts.RemoveAt(2);
             }
 
-            // Afficher sprites sur grid
-            int a = AIvsAI ? 5 : 0; // Donnée pour bien caler l'emplacement des sprites selon si Zeus apparaît ou non (AIvsAI)
+            // Animation of the levels sprite representation
+            int a = AIvsAI ? 5 : 0; // Data for placement depending of the levels disponibility
             for (int y = yMax + 1; y >= 2; y--)
             {
                 for (int i = 0; i < sprites.Length; i++)
@@ -202,17 +275,29 @@ namespace Jeu_de_combat
                 }
             }
 
-            return Selector(buts, texts.ToArray());
+            return Selector(buts, texts.ToArray()); // Buttons set up
         }
 
+        /// <summary>
+        /// Fight start animation
+        /// </summary>
+        /// <param name="playerLeft"></param>
+        /// <param name="playerRight"></param>
         public static void DisplayFight(Character playerLeft, Character playerRight)
         {
+            // Fight text sprite
+            string fight = "FFFFF I  GGGGG H   H TTTTT I"
+                   +  "\nF        G     H   H   T   I"
+                   +  "\nFFF   I  G  GG HHHHH   T   I"
+                   +  "\nF     I  G   G H   H   T    "
+                   +  "\nF     I  GGGGG H   H   T   O";
+
             Fade();
-
             SoundManager.Play("bg_fight.mp3", true);
-            FloorAnim(); // Sol qui arrive
+            FloorAnim();
 
-            for (int i = 10; i >= 0; i--) // Apparition des joueurs
+            // Players character arrival animation
+            for (int i = 10; i >= 0; i--) 
             {
                 StringToGrid(playerLeft.SpriteLeftInstance, charLeft - i, 2, playerLeft.SpriteColorInstance, 1, 0);
                 StringToGrid(playerRight.SpriteRightInstance, charRight + i, 2, playerRight.SpriteColorInstance, -1, 0);
@@ -222,80 +307,83 @@ namespace Jeu_de_combat
                 Thread.Sleep(50);
             }
 
-            string go = "FFFFF I  GGGGG H   H TTTTT I"
-                   +  "\nF        G     H   H   T   I"
-                   +  "\nFFF   I  G  GG HHHHH   T   I"
-                   +  "\nF     I  G   G H   H   T    "
-                   +  "\nF     I  GGGGG H   H   T   O";
-
+            // Fight appearance animation
             for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(go, 12, 1-i, gridTextC, 0, -1);
+                StringToGrid(fight, 12, 1-i, gridTextC, 0, -1);
                 PrintGrid();
                 Thread.Sleep(50);
             }
             SoundManager.Play("win.mp3");
             Thread.Sleep(500);
+
+            // Fight text vanish animation
             for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(go, 12, -5 + i, gridTextC, 0, 1);
+                StringToGrid(fight, 12, -5 + i, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(50);
             }
         }
 
+        /// <summary>
+        /// Button selection display
+        /// </summary>
+        /// <param name="butsText"></param>
+        /// <param name="texts"></param>
+        /// <returns></returns>
         public static string Selector(string[] butsText, string[] texts)
         {
-            ClearInputs();
-            _buttonIndex = butsText.Count() / 2;
+            _buttonIndex = (int)Math.Ceiling((decimal)butsText.Count() / 2) - 1; // Center preset selected button
             string easterEgg = ""; // EasterEgg...
-            string nextScene = "";
-            ConsoleKey choice;
+            string nextScene = ""; // User choice
+
+            ConsoleKey input; // User input
             do
             {
+                ClearInputs();
                 PrintButs(butsText);
-                if (texts.Length <= 1)
-                {
-                    if (text != _defaultText)
-                    {
-                        text = texts[0];
-                        PrintText(text, 0);
-                    }
-                }
-                else
-                {
-                    text = texts[_buttonIndex];
-                    PrintText(text, 0);
-                }
 
-                Console.SetCursorPosition(0, Console.WindowTop);
-                choice = Console.ReadKey().Key;
-                Console.SetCursorPosition(0, Console.CursorTop); Console.Write(' ');
+                if (texts[0] == _defaultText && _actualText != _defaultText) // Print default text if we have to do it
+                    PrintText(_defaultText, 0);
+                else                                                         // Else print specified button text
+                    PrintText(texts[_buttonIndex], 0);
 
-                if (choice == ConsoleKey.LeftArrow)
+                // Read user input at the right bottom corner then erase it from the screen to keep a clean window
+                Console.SetCursorPosition(Console.WindowWidth - 2, Console.WindowHeight - 2);
+                input = Console.ReadKey().Key;
+                Console.SetCursorPosition(Console.WindowWidth-2, Console.WindowHeight - 2);
+                Console.Write(' ');
+
+                // Change selected button 
+                if (input == ConsoleKey.LeftArrow) 
+                {
+                    SoundManager.Play("arrow_key.mp3");
                     _buttonIndex--;
-                else if (choice == ConsoleKey.RightArrow)
+                }
+                else if (input == ConsoleKey.RightArrow)
+                {
+                    SoundManager.Play("arrow_key.mp3");
                     _buttonIndex++;
+                }
 
+                // Return to the first button if user press right arrow while being on the last button
                 if (_buttonIndex >= butsText.Length)
                     _buttonIndex = 0;
+                // Return to the last button if user press left arrow while being on the first button
                 else if (_buttonIndex < 0)
                     _buttonIndex = butsText.Length - 1;
 
-
-                // Easter Egg..
-                easterEgg += choice;
+                #region Beber Easter Egg
+                easterEgg += input;
                 if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
-                    Beber();
+                    Beber(0);
+                #endregion
+            } while (input != ConsoleKey.Enter && input != ConsoleKey.Spacebar);
 
-                SoundManager.Play("arrow_key.mp3");
-
-            } while (choice != ConsoleKey.Enter);
+            // User press Enter or Space
             SoundManager.Play("selection.mp3");
-
-            text = "";
-            if (nextScene != "BEBER")
-                nextScene = butsText[_buttonIndex];
+            nextScene = butsText[_buttonIndex];
             return nextScene;
         }
 
@@ -327,7 +415,7 @@ namespace Jeu_de_combat
                 {
                     for (int x = 0; x < slice[y].Length; x++)
                     {
-                        if ((x + oX > 0 && y + oY > 0 && x + oX < xMax && y + oY < yMax) || sprite == _emptyGridString)
+                        if ((x + oX > 0 && y + oY > 0 && x + oX < xMax && y + oY < yMax) || sprite == _gridBorders)
                         {
                             _grid[x + oX, y + oY] = slice[y][x];
                             _colorGrid[x + oX, y + oY] = color;
@@ -570,6 +658,11 @@ namespace Jeu_de_combat
 
         public static void DefenseAnim(bool isLeft, bool erase = false)
         {
+            /// <summary>
+            /// Defense shield sprite
+            /// </summary>
+            const string defense = "|\n|\n|\n|";
+
             int x = 11;
             if (!isLeft)
                 x = 40;
@@ -582,6 +675,7 @@ namespace Jeu_de_combat
             }
             else
             {
+                SoundManager.Play("defend.mp3");
                 for(int i=4; i >= 0; i--)
                 {
                     StringToGrid(defense, x, 2-i, defaultColor, 0, -1);
@@ -593,6 +687,14 @@ namespace Jeu_de_combat
 
         private static void FloorAnim()
         {
+            /// <summary>
+            /// Floor of the game arena, composed of "===" of grid width length
+            /// </summary>
+            string _floor = new string('=', xMax / 2);
+
+            const ConsoleColor floorC = ConsoleColor.DarkGreen;
+            const int floorTop = yMax - 1;
+
             for (int i = 0; i <= xMax / 2 + 1; i++)
             {
                 StringToGrid(_floor, -_floor.Length + i, floorTop, floorC);
@@ -604,6 +706,10 @@ namespace Jeu_de_combat
 
         public static void Fade(bool intro = true, bool outro = true, int delay = 150) // Animation de transition de scène avec un fondu
         {
+            /// <summary>
+            /// Middle line (---) of grid width length
+            /// </summary>
+            string _line = new string('-', xMax);
             ConsoleColor color = ConsoleColor.DarkGray;
             // Effacer le texte et les boutons
             Console.SetCursorPosition(0, yMax + 2);
@@ -690,6 +796,7 @@ namespace Jeu_de_combat
             PrintText($"{winner.Name} (Player {w}) wins !");
 
             // Animation des confettis qui arrivent 
+            SoundManager.Play("win2.mp3", true);
             for (int i = 5; i >= 0; i--)
             {
                 StringToGrid(confets1, 1, 1 - i, ConsoleColor.Yellow, -1, 0);
@@ -699,7 +806,7 @@ namespace Jeu_de_combat
             }
 
             // Animation qui fait croire que des confettis tombent en bouclent
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 26; i++)
             {
                 if (i % 2 == 1)
                 {
@@ -832,7 +939,7 @@ namespace Jeu_de_combat
                 //    Console.WriteLine(new string(' ', Console.WindowWidth
                 //    
                 // Efface l'intérieur de la grille
-                StringToGrid(_emptyGridString, 0, 0, defaultColor);
+                StringToGrid(_gridBorders, 0, 0, defaultColor);
             }
             if (buttons)
             {
@@ -856,9 +963,11 @@ namespace Jeu_de_combat
             string c = "\"MONOMACHIA\""
                 + "-A P5INJ PRODUCTION"
                 + "-Gameplay Programmer : Adam Adhar"
-            + "-Sound Designer : Elliot Nedellec"
             + "-Graphics Implementation : Marius Boulandet"
-            + "-Special thanks : Beber"
+            + "-Audio Implementation : Elliot Nedellec"
+            + "-All sounds and musics are from Itch.io :"
+            + "-TipTopTomCat and Swiss Arcade Game Entertainment"
+            + "--Special thanks : Beber"
             + "-2024 ©"
             + "---Thanks for playing <3";
             string credits = "";
@@ -878,25 +987,25 @@ namespace Jeu_de_combat
             Fade(true, false);
         }
 
-        private static void Beber() // Un petit easter egg en l'hommage de notre promo et de sa mascotte !
+        /// <summary>
+        /// A little Easter Egg in tribute to our class and its mascot, Beber !
+        /// </summary>
+        private static void Beber(int colorId)
         {
-            SoundManager.StopAllLoops();
-            Fade(true, true);
-            SoundManager.Play("credits.mp3", true);
-            ConsoleColor beberC = ConsoleColor.DarkYellow;
+            // Sprites for the easter egg
             string beberText = "oo  ooo oo  ooo ooo"
                 + "\no o o   o o o   o o"
                 + "\nooo oo  ooo oo  ooo"
                 + "\no o o   o o o   oo "
                 + "\noo  ooo oo  ooo o o";
-            beberText = beberText.Replace('o', '*');
+            beberText = beberText.Replace('o', '#');
 
             string psinj = "ooo ooo o o  o   o"
                        + "\no o o     o  o   o"
                        + "\nooo ooo o oo o   o"
                        + "\no     o o o oo   o"
                        + "\no   ooo o o  o ooo";
-            psinj = psinj.Replace('o', '*');
+            psinj = psinj.Replace('o', '#');
 
             string beber = "   .-\"-.   "
             + "\n _/.-.-.\\_ "
@@ -904,7 +1013,14 @@ namespace Jeu_de_combat
             + "\n |/  \"  \\| "
             + "\n  \\ .-. /  "
             + "\n  /`\"\"\"`\\  ";
+            ConsoleColor[] colors = [ConsoleColor.DarkYellow,ConsoleColor.Red,ConsoleColor.Magenta,ConsoleColor.Green,ConsoleColor.Blue,ConsoleColor.Cyan];
+            ConsoleColor beberC = colors[colorId];
 
+            SoundManager.StopAllLoops();
+            Fade(true, true);
+            SoundManager.Play("credits.mp3", true);
+
+            // Beber animation
             for (int y = yMax + 1; y > 0; y--)
             {
                 StringToGrid(beberText, 1, y, gridTextC, 0, 1);
@@ -913,10 +1029,13 @@ namespace Jeu_de_combat
                 PrintGrid();
                 Thread.Sleep(300);
             }
-
             Thread.Sleep(1000);
-            Selector(["Beber"], ["Beber."]);
-            Environment.Exit(0);
+
+            if (Selector(["Beber"], ["Beber."]) == "Beber") // Buttons set up
+            {
+                Random rand = new Random();
+                Beber(rand.Next(0,colors.Count()));
+            }
         }
     }
 }
