@@ -22,7 +22,6 @@ namespace Jeu_de_combat
                 "damager_ulti.mp3", //Explosion 5 - Sound effects Pack 2
                 "fire.mp3",         //Laser-weapon 2 - Sound effects Pack 2
                 "hit.mp3",          //Hit 4 - Sound effects Pack 2
-                "lose.mp3",         //Lose 6 - Sound effects Pack 2
                 "spark.mp3",        //1up 8 - Sound effects Pack 2
                 "spell.mp3",        //1up 3 - Sound effects Pack 2
                 "win.mp3",          //1up 1 - Sound effects Pack 2
@@ -81,6 +80,9 @@ namespace Jeu_de_combat
             return sounds[sound].playState == WMPPlayState.wmppsPlaying;
         }
 
+        /// <summary>
+        /// Stop all looping sounds
+        /// </summary>
         public static void StopAllLoops()
         {
             foreach(var sound in loops)
