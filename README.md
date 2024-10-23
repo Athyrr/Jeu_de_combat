@@ -1,11 +1,11 @@
 ﻿# Monomachía
-                 +--------------------------------------------------+
-			           |						                                      |
+                 		   +--------------------------------------------------+
+			           |						      |
 			           | MMMM OOOO N  N OOOO MMMM  AA  CCCC H  H  /   AA  |
 			           | M  M O  O NN N O  O M  M A  A C    HHHH     A  A |
 			           | M  M O  O N NN O  O M  M AAAA C    HHHH  I  AAAA |
 			           | M  M OOOO N  N OOOO M  M A  A CCCC H  H  I  A  A |
-			           |						                                      |
+			           |						      |
 			           +--------------------------------------------------+
 
 -> FRANCAIS
