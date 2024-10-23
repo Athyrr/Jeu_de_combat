@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# Combat-Game
                  +--------------------------------------------------+
 			     |						                            |
@@ -7,6 +8,17 @@
 			     | M  M OOOO N  N OOOO M  M A  A CCCC H  H  I  A  A |
 			     |						                            |
 			     +--------------------------------------------------+
+=======
+﻿# Monomachía
+                 		   +--------------------------------------------------+
+			           |						      |
+			           | MMMM OOOO N  N OOOO MMMM  AA  CCCC H  H  /   AA  |
+			           | M  M O  O NN N O  O M  M A  A C    HHHH     A  A |
+			           | M  M O  O N NN O  O M  M AAAA C    HHHH  I  AAAA |
+			           | M  M OOOO N  N OOOO M  M A  A CCCC H  H  I  A  A |
+			           |						      |
+			           +--------------------------------------------------+
+>>>>>>> eed35c87efea655822b7da5c814235bfa797eecf
 
 -> FRANCAIS
 
@@ -131,4 +143,8 @@ IA Levels :
 Easters Egg :
 "BEBER" : An hidden tribute to our class "PSINJ" mascot, Beber.
 "Revenge from Hell" : A graphic bug we didn't remove because it was very funny. Damager's rage is so
+<<<<<<< HEAD
 powerful that it persists despite death..
+=======
+powerful that it persists despite death..
+>>>>>>> eed35c87efea655822b7da5c814235bfa797eecf
