@@ -904,13 +904,15 @@ namespace Jeu_de_combat
 
                 #region Beber Easter Egg
                 string b = input.ToString().ToUpper();
-                if (b=="B"||b=="E"||b=="R"||b=="P"||b=="S"||b=="I"||b=="N"||b=="J")
+                if (b == "B" || b == "E" || b == "R")
                 {
                     SoundManager.Play("selection.mp3");
-                    easterEgg += input;
-                    if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
+                    easterEgg += b;
+                    if (easterEgg.ToUpper().Contains("BEBER"))
                         Beber(6);
                 }
+                else
+                    easterEgg = "";
                 #endregion
             } while (input != ConsoleKey.Enter && input != ConsoleKey.Spacebar && input != ConsoleKey.DownArrow);
 

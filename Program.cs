@@ -426,13 +426,13 @@ namespace Jeu_de_combat
             if (_player1 is Damager damager1 && damager1.SpecialEffectEnabled)
             {
                 int receivedDamages = damager1.DamagesTaken;
-                if (receivedDamages == 0)
+                if (receivedDamages > 0)
                 {
-                    GameDisplay.PrintText("Damager (Player1) special missed !");
-                    Thread.Sleep(500);
+                    GameDisplay.DamagerSpecialAnim(true, receivedDamages);
+                    _player1.Attack(_player2, receivedDamages);
                 }
-                GameDisplay.DamagerSpecialAnim(true, receivedDamages);
-                _player1.Attack(_player2, receivedDamages);
+                GameDisplay.PrintText("Damager (Player 1) special missed !");
+                Thread.Sleep(500);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -441,13 +441,13 @@ namespace Jeu_de_combat
             if (_player2 is Damager damager2 && damager2.SpecialEffectEnabled)
             {
                 int receivedDamages = damager2.DamagesTaken;
-                if (receivedDamages == 0)
+                if (receivedDamages > 0)
                 {
-                    GameDisplay.PrintText("Damager (Player2) special missed !");
-                    Thread.Sleep(500);
+                    GameDisplay.DamagerSpecialAnim(false, receivedDamages);
+                    _player2.Attack(_player1, receivedDamages);
                 }
-                GameDisplay.DamagerSpecialAnim(false, receivedDamages);
-                _player2.Attack(_player1, receivedDamages);
+                GameDisplay.PrintText("Damager (Player 2) special missed !");
+                Thread.Sleep(500);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -554,7 +554,7 @@ namespace Jeu_de_combat
                         case "Defend":
                             if (canHeal)
                                 return "Special";
-                            if (choices.Contains("Defend"))
+                            if (choices.Contains("Defend") && source.Health>target.Strength)
                                 return "Defend";
                             break;
 
