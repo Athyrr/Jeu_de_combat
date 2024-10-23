@@ -148,10 +148,13 @@
         protected virtual void TakeDamage(Character damageSource, int damageAmount)
         {
             if (_isDefending)
+            {
+                previousChoices.Remove("Special");
                 if (damageSource is not Tank tank || !tank.SpecialEffectEnabled)
                     return;
                 else if (tank.SpecialEffectEnabled)
                     damageAmount -= 1;
+            }
 
 
             _health = Math.Max(0, _health - damageAmount);
@@ -165,9 +168,9 @@
         /// <summary>
         /// Defends the character, and avoid taken damages.
         /// </summary>
-        public void Defend(bool lookRight)
+        public void Defend(bool isLeft)
         {
-            GameDisplay.DefenseAnim(lookRight);
+            GameDisplay.DefenseAnim(isLeft);
             _isDefending = true;
         }
 

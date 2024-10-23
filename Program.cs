@@ -235,7 +235,7 @@ namespace Jeu_de_combat
                 AttackSelection(_player2, _player1);
 
                 GameDisplay.ClearScreen(false);
-                if (difficulty[0] =="Zeus")
+                if (difficulty[0]=="Zeus")
                 {
                     _defendProcesses.Reverse();
                     _attackProcesses.Reverse();
@@ -268,33 +268,32 @@ namespace Jeu_de_combat
                 $"{question}{source.SpecialDescription}"
             };
 
-            // Si le personnage a déjà utilisé son spécial ou est en incapacité de l'utiliser, on lui retire la possibilité de le réutiliser
+            // If player can't use his special
             if (source.previousChoices.Contains("Special") || source is Healer && source.Health >= source.MaxHealth - 1 || source is Tank && source.Health == 1)
             {
                 choices.Remove("Special");
                 choicesText.RemoveAt(2);
             }
 
-            // On retire des possibilités la dernière action effectuée
+            // If player defended last turn and so can't defend again
             int id = -1;
             if(source.previousChoices.Count > 0)
-                id = choices.IndexOf(source.previousChoices[source.previousChoices.Count-1]);
-
-            if (id >= 0 && source.previousChoices[source.previousChoices.Count - 1] != "Attack")
             {
-                choices.RemoveAt(id);
-                choicesText.RemoveAt(id);
+                if (source.previousChoices[source.previousChoices.Count()-1] == "Defend")
+                {
+                    choices.Remove("Defend");
+                    choicesText.RemoveAt(1);
+                }
             }
 
-            if (!source.IsIA) // Choix du joueur
+            if (!source.IsIA) // User choice
             {
                 choice = GameDisplay.Selector(choices.ToArray(), choicesText.ToArray());
             }
-            else // Choix de l'IA
+            else // AI choice
             {
                 choice = AIBehavior(source, choices.ToArray(), target);
             }
-
             source.previousChoices.Add(choice);
 
             if (choice == "Attack")
@@ -426,9 +425,14 @@ namespace Jeu_de_combat
 
             if (_player1 is Damager damager1 && damager1.SpecialEffectEnabled)
             {
-                int reveivedDamages = damager1.DamagesTaken;
-                GameDisplay.DamagerSpecialAnim(true, reveivedDamages);
-                _player1.Attack(_player2, reveivedDamages);
+                int receivedDamages = damager1.DamagesTaken;
+                if (receivedDamages == 0)
+                {
+                    GameDisplay.PrintText("Damager (Player1) special missed !");
+                    Thread.Sleep(500);
+                }
+                GameDisplay.DamagerSpecialAnim(true, receivedDamages);
+                _player1.Attack(_player2, receivedDamages);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -436,9 +440,14 @@ namespace Jeu_de_combat
 
             if (_player2 is Damager damager2 && damager2.SpecialEffectEnabled)
             {
-                int reveivedDamages = damager2.DamagesTaken;
-                GameDisplay.DamagerSpecialAnim(false, reveivedDamages);
-                _player2.Attack(_player1, reveivedDamages);
+                int receivedDamages = damager2.DamagesTaken;
+                if (receivedDamages == 0)
+                {
+                    GameDisplay.PrintText("Damager (Player2) special missed !");
+                    Thread.Sleep(500);
+                }
+                GameDisplay.DamagerSpecialAnim(false, receivedDamages);
+                _player2.Attack(_player1, receivedDamages);
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -451,57 +460,71 @@ namespace Jeu_de_combat
         public static string AIBehavior(Character source, string[] choices, Character target)
         {
             Random rand = new Random();
-            string choice = choices[rand.Next(0, choices.Count())]; // Choix aléatoire prédifini
-            int which = source.IsLeft ? 1 : 0;
+            string choice = choices[rand.Next(0, choices.Count())]; // Random preset choice
+            int which = source.IsLeft ? 1 : 0; // Which AI between left and right (in AI vs AI) to get his level
 
             switch (difficulty[which])
             {
-                case "Tyche": // L'IA effectuera un choix aléatoire
-                    return choice;
+                // AI will do a choice randomly, with a 10% chance doing its special ability.
+                case "Tyche": 
+                    int r = rand.Next(0, 100);
+                    if (r < 10 && !source.previousChoices.Contains("Special"))
+                        choice = "Special";
+                    else
+                    {
+                        List<string> newChoices = choices.ToList();
+                        newChoices.Remove("Special");
+                        choice = newChoices[rand.Next(0, newChoices.Count())];
+                    }
 
-                case "Athena": // L'IA effectuera le meilleur choix possible selon sa situation actuelle 
+
+
+                    break;
+
+                // AI will do a coherent choice according to his situation (character, life points)
+                case "Athena": 
                     switch (source.CharacterClass)
                     {
-                        case CharacterClasses.Damager: // Si l'IA est un Damager
-                            // Si la vie de l'IA est plus grande que 2 et que l'IA peut faire son spécial, elle a une chance sur deux de le faire
+                        case CharacterClasses.Damager: // AI is a Damager
+                            // If AI's life is greater than 2, it has half a chance to do its special ability Rage
                             if (source.Health > source.MaxHealth / 2 && choices.Contains("Special") && rand.Next(0, 2) == 0)
                                 choice = "Special";
 
-                            // Sinon, si la vie de l'IA est plus grande que 2 et que l'IA peut attaquer, elle attaque
+                            // Else if AI's life's greater than 2, it attacks
                             else if (source.Health > source.MaxHealth / 2 && choices.Contains("Attack"))
                                 choice = "Attack";
 
-                            // Sinon, si la vie est plus petite ou égale à deux et qu'elle peut se défendre, elle défend
+                            // Else if AI's life's smaller than 3, it defends
                             else if (source.Health <= 2 && choices.Contains("Defend"))
                                 choice = "Defend";
 
                             break;
 
-                        case CharacterClasses.Healer: // Si l'IA est un Healer
-                            // Si la vie de l'IA est plus petite ou égale à 2 et que l'IA peut faire son spécial, elle le fait
+                        case CharacterClasses.Healer: // AI is a Healer
+                            // If AI's life is smaller than 3, it does its special ability Heal
                             if (source.Health <= source.MaxHealth - 2 && choices.Contains("Special"))
                                 choice = "Special";
 
-                            // Si la vie de l'IA est plus petite ou égale à 2 et qu'elle peut se défendre, elle le fait.
+                            // Else if AI's life is smaller than 3 but it can't do its special, it defends
                             else if (source.Health <= source.MaxHealth - 2 && choices.Contains("Defend"))
                                 choice = "Defend";
 
-                            // Sinon, si elle peut attaquer, elle le fait
+                            // Else, it attacks
                             else if (choices.Contains("Attack"))
                                 choice = "Attack";
 
                             break;
 
-                        case CharacterClasses.Tank: // Si l'IA est un Tank
-                            // Si la vie de l'IA est supérieure à 3 et qu'il peut faire son spécial, il le fait
-                            if (source.Health > source.MaxHealth / 2 && choices.Contains("Special"))
+                        case CharacterClasses.Tank: // If AI is a Tank
+                            // AI has half a chance to do its special if it has over 2 life points 
+                            if (source.Health > 2 && rand.Next(0,2)==0 && choices.Contains("Special"))
                                 choice = "Special";
 
-                            // Sinon, si sa vie est inférieure ou égale à 2 et qu'il peut se défendre, il le fait
+                            // Else if its life is smaller than 3, it defends
                             else if (source.Health <= 2 && choices.Contains("Defend"))
                                 choice = "Defend";
 
-                            // Sinon, si il peut attaquer, il le fait
+                            // Else it attacks
                             else if (choices.Contains("Attack"))
                                 choice = "Attack";
 
@@ -509,115 +532,74 @@ namespace Jeu_de_combat
                     }
                     break;
 
-                case "Zeus": // L'IA jouera avant nous et effectuera le meilleur choix possible en étudiant toutes les situations possibles grâce à une simulation sur 2 tours
-                    string playerChoice = target.previousChoices[target.previousChoices.Count-1]; // L'IA Zeus, omnisciente, récupère le choix du joueur.
+                // AI will play before the player while already know his action and so will do the best possible choice
+                case "Zeus":
+                    string playerChoice = target.previousChoices[target.previousChoices.Count-1];
                     if(playerChoice=="Special")
                         playerChoice = target.Name;
 
-                    List<string> zeusFDP = choices.ToList(); zeusFDP.Remove("Special");
-                    choice = zeusFDP[rand.Next(0,zeusFDP.Count)];
+                    bool canHeal = (source is Healer && source.Health <= source.MaxHealth-2 && choices.Contains("Special"));
+                    bool canRage = (source is Damager && choices.Contains("Special"));
+                    bool canStrong = (source is Tank && choices.Contains("Special") && source.Health > 1);
 
-                    switch(playerChoice)
+                    // Can AI kill the player ?
+                    if (target.Health <= source.Strength + (playerChoice == "Defend" ? 0 : 1) && canStrong)
+                        return "Special";
+                    if (target.Health <= source.Strength && choices.Contains("Attack") && playerChoice != "Defend")
+                        return "Attack";
+
+                    // Else we check what the player will do and act in consequence
+                    switch (playerChoice)
                     {
-                        case "Defend": // Le joueur va se défendre
-                            if(choices.Contains("Special"))
-                                // Si l'IA est un Tank et que son spécial qui va malgré tout tuer le joueur
-                                // OU que l'IA est un Healer et qu'il a perdu 2 points de vie ou plus
-                                if (source is Tank && source.Health > 1 && target.Health == 1
-                                    || source is Healer && source.Health <= source.MaxHealth - 2)
-                                    return "Special";
-
-                            if(choices.Contains("Attack"))
-                                // Si l'IA serait en danger au prochain tour si elle ne garde pas son action défense, elle attaque
-                                if (source.Health <= target.Strength
-                                    || target is Tank && !target.previousChoices.Contains("Special") && source.Health <= 2)
-                                    return "Attack";
-
-                            // Sah jsp
-                            if(choices.Contains("Defend"))
-                                return "Defend";
-                            break;
-
-                        case "Attack": // Le joueur va attaquer
-                            if (choices.Contains("Attack"))
-                                // Si l'attaque de l'IA va tuer le joueur
-                                if (source.Strength >= target.Health)
-                                    return "Attack";
-
-                            if (choices.Contains("Special"))
-                                // Si l'IA est un Damager/Tank et que son spécial va tuer le joueur
-                                // OU que l'IA est un Healer qui ne peut pas se défendre mais doit se soigner pour éviter la mort
-                                if ((source is Damager && source.Health > target.Strength && target.Health <= target.Strength * 2)
-                                || (source is Tank && source.Health > 1 && target.Health <= 2)
-                                || (source is Healer && !choices.Contains("Defend") && source.Health <= target.Strength))
-                                    return "Special";
-
-
-                            if (choices.Contains("Defend"))
-                                // Si l'attaque qui arrive est mortelle
-                                if (source.Health <= target.Strength)
-                                    return "Defend";
-
-                            break;
-
-                        case "Damager": // Le joueur va utiliser la capacité Rage 
-                            if (choices.Contains("Attack"))
-                                // Si l'attaque va tuer le Damager avant qu'il puisse faire son spécial
-                                if (source.Strength >= target.Health)
-                                    return "Attack";
-
-                            if (choices.Contains("Defend"))
-                                // Si l'IA peut se défendre, elle le fait pour éviter le contrecoup 
-                                    return "Defend";
-
-                            if (choices.Contains("Special"))
-                                // Si l'IA est un Damager ou un Healer, elle fait son spécial pour éviter le contrecoup
-                                // OU si l'IA est un Tank dont le spécial tuerait le joueur
-                                if(source is Damager || source is Healer || source is Tank && source.Health > 1 && target.Health <= 2)
-                                    return "Special"; 
-
-                            break;
-
-                        case "Healer": // Le joueur va attaquer
-                            if (choices.Contains("Attack"))
-                                // Si l'attaque va tuer le Damager avant qu'il puisse faire son spécial
-                                if (source.Strength >= target.Health)
-                                    return "Attack";
-
-                            if (choices.Contains("Special"))
-                                // Si le spécial du Tank va tuer le joueur 
-                                // OU que l'IA est un Healer qui doit se soigner
-                                if(source is Tank && source.Health > 1 && target.Health <= 2
-                                    || source is Healer && source.Health <= source.MaxHealth - 2)
+                        case "Defend":
+                            if (canHeal)
                                 return "Special";
-
-                            if (choices.Contains("Attack"))
-                                // Sinon, on attaque malgré tout
-                                return "Attack";
-
-                            break;
-
-                        case "Tank": // Le joueur va attaquer
-                            if (choices.Contains("Special"))
-                                // Si le spécial du Damager va tuer le joueur et qu'on peut encaisser l'attaque du Tank
-                                // OU Si le spécial du Tank va tuer le joueur et qu'on peut l'utiliser
-                                // OU Si on doit se soigner
-                                if(source is Damager && source.Health > 2 && target.Health <= 4
-                                    || source is Tank && source.Health > 1 && target.Health <= 2
-                                    || source is Healer && source.Health <= source.MaxHealth - 2)
-                                    return "Special";
-
-                            if (choices.Contains("Attack"))
-                                // Si notre attaque va tuer le joueur
-                                if (source.Strength >= target.Health)
-                                    return "Attack";
-
                             if (choices.Contains("Defend"))
                                 return "Defend";
-
                             break;
-                    }
 
+                        case "Attack":
+                            if(target.Strength>=source.Health) // Attack will kill the AI
+                            {
+                                if (canHeal)
+                                    return "Special";
+                                if (choices.Contains("Defend"))
+                                    return "Defend";
+                            }
+                            if (canStrong)
+                                return "Special";
+                            break;
+
+                        case "Damager": // Player is a Damager and use his special
+                            if (canHeal)
+                                return "Special";
+                            if (choices.Contains("Defend"))
+                                return "Defend";
+                            if (canRage)
+                                return "Special";
+                            break;
+
+                        case "Healer": // Player is a Healer and use his special
+                            if (canHeal || canStrong)
+                                return "Special";
+                            break;
+
+                        case "Tank": // Player is a Tank and use his special
+                            if (target.Strength+1 >= source.Health) // Strong Attack will kill the AI
+                            {
+                                if (canHeal)
+                                    return "Special";
+                                if (choices.Contains("Defend"))
+                                    return "Defend";
+                            }
+                            if (canStrong || canRage)
+                                return "Special";
+                            if (choices.Contains("Defend"))
+                                return "Defend";
+                            break;
+
+                    }
+                    return "Attack";
                     break;
 
                 default:

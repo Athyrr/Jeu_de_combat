@@ -25,7 +25,7 @@ namespace Jeu_de_combat
                 "spark.mp3",        //1up 8 - Sound effects Pack 2
                 "spell.mp3",        //1up 3 - Sound effects Pack 2
                 "win.mp3",          //1up 1 - Sound effects Pack 2
-                "defend.mp3",       //Teleport 2 - Sound effects Pack 2
+                "defend.flac",       //Teleport 2 - Sound effects Pack 2
                 "defend_break.mp3"  //Teleport 8 - Sound effects Pack 2
             };
 
@@ -45,6 +45,7 @@ namespace Jeu_de_combat
             }
             sounds["arrow_key.mp3"].settings.volume = 30;
             sounds["selection.mp3"].settings.volume = 30;
+
         }
 
         /// <summary>

@@ -100,6 +100,7 @@ namespace Jeu_de_combat
         static string _gridBorders = "";
         #endregion
 
+        #region Initialization
         /// <summary>
         /// Initialisation of the GameDisplay module
         /// </summary>
@@ -140,10 +141,12 @@ namespace Jeu_de_combat
                 if (y < _grid.GetLength(1) - 1)
                     _gridBorders += '\n';
             }
-            StringToGrid(_gridBorders, 0, 0);
+            SpriteToGrid(_gridBorders, 0, 0);
             #endregion
         }
+        #endregion
 
+        #region Menus display
         /// <summary>
         /// Menu selection 
         /// </summary>
@@ -162,7 +165,7 @@ namespace Jeu_de_combat
             // Title text animation
             for (int y = yMax + 1; y > 1; y--)
             {
-                StringToGrid(title, 2, y, gridTextC, 0, 1);
+                SpriteToGrid(title, 2, y, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(250);
             }
@@ -188,9 +191,9 @@ namespace Jeu_de_combat
             // Arrival animation of two characters, the VS text
             for (int i = 10; i > 0; i--)
             {
-                StringToGrid(Damager.SpriteLeft, charLeft - i, 2, Damager.SpriteColor, 1, 0);
-                StringToGrid(Tank.SpriteRight, charRight + i, 2, Tank.SpriteColor, -1, 0);
-                StringToGrid(vs, 20, 2 - i, gridTextC, 0, -1);
+                SpriteToGrid(Damager.SpriteLeft, charLeft - i, 2, Damager.SpriteColor, 1, 0);
+                SpriteToGrid(Tank.SpriteRight, charRight + i, 2, Tank.SpriteColor, -1, 0);
+                SpriteToGrid(vs, 20, 2 - i, gridTextC, 0, -1);
                 PrintGrid();
                 Thread.Sleep(100);
             }
@@ -211,10 +214,10 @@ namespace Jeu_de_combat
             // Animation of the three characters and the random choice sprites 
             for (int y = yMax + 1; y >= 2; y--)
             {
-                StringToGrid(Damager.SpriteLeft, 6, y, Damager.SpriteColor, 0, 1);
-                StringToGrid(Healer.SpriteLeft, 16, y, Healer.SpriteColor, 0, 1);
-                StringToGrid(Tank.SpriteRight, 27, y, Tank.SpriteColor, 0, 1);
-                StringToGrid(randomSprite, 38, y, gridTextC, 0, 1);
+                SpriteToGrid(Damager.SpriteLeft, 6, y, Damager.SpriteColor, 0, 1);
+                SpriteToGrid(Healer.SpriteLeft, 16, y, Healer.SpriteColor, 0, 1);
+                SpriteToGrid(Tank.SpriteRight, 27, y, Tank.SpriteColor, 0, 1);
+                SpriteToGrid(randomSprite, 38, y, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(75);
             }
@@ -269,7 +272,7 @@ namespace Jeu_de_combat
             {
                 for (int i = 0; i < sprites.Length; i++)
                 {
-                    StringToGrid(sprites[i], (i + 1) * 8 + a + (6 + a) * i, y, colors[i], 0, 1);
+                    SpriteToGrid(sprites[i], (i + 1) * 8 + a + (6 + a) * i, y, colors[i], 0, 1);
                     PrintGrid();
                     Thread.Sleep(50);
                 }
@@ -299,10 +302,10 @@ namespace Jeu_de_combat
             // Players character arrival animation
             for (int i = 10; i >= 0; i--) 
             {
-                StringToGrid(playerLeft.SpriteLeftInstance, charLeft - i, 2, playerLeft.SpriteColorInstance, 1, 0);
-                StringToGrid(playerRight.SpriteRightInstance, charRight + i, 2, playerRight.SpriteColorInstance, -1, 0);
-                StringToGrid(new string(lifePoint[0], playerLeft.Health), 2 - i, 1, lifeC, -1, 0);
-                StringToGrid(new string(lifePoint[0], playerRight.Health), xMax - playerRight.Health - 1 + i, 1, lifeC, 1, 0);
+                SpriteToGrid(playerLeft.SpriteLeftInstance, charLeft - i, 2, playerLeft.SpriteColorInstance, 1, 0);
+                SpriteToGrid(playerRight.SpriteRightInstance, charRight + i, 2, playerRight.SpriteColorInstance, -1, 0);
+                SpriteToGrid(new string(lifePoint[0], playerLeft.Health), 2 - i, 1, lifeC, -1, 0);
+                SpriteToGrid(new string(lifePoint[0], playerRight.Health), xMax - playerRight.Health - 1 + i, 1, lifeC, 1, 0);
                 PrintGrid();
                 Thread.Sleep(50);
             }
@@ -310,7 +313,7 @@ namespace Jeu_de_combat
             // Fight appearance animation
             for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(fight, 12, 1-i, gridTextC, 0, -1);
+                SpriteToGrid(fight, 12, 1-i, gridTextC, 0, -1);
                 PrintGrid();
                 Thread.Sleep(50);
             }
@@ -320,460 +323,31 @@ namespace Jeu_de_combat
             // Fight text vanish animation
             for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(fight, 12, -5 + i, gridTextC, 0, 1);
+                SpriteToGrid(fight, 12, -5 + i, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(50);
             }
         }
 
         /// <summary>
-        /// Button selection display
+        /// End game display
         /// </summary>
-        /// <param name="butsText"></param>
-        /// <param name="texts"></param>
-        /// <returns></returns>
-        public static string Selector(string[] butsText, string[] texts)
-        {
-            _buttonIndex = (int)Math.Ceiling((decimal)butsText.Count() / 2) - 1; // Center preset selected button
-            string easterEgg = ""; // EasterEgg...
-            string nextScene = ""; // User choice
-
-            ConsoleKey input; // User input
-            do
-            {
-                ClearInputs();
-                PrintButs(butsText);
-
-                if (texts[0] == _defaultText && _actualText != _defaultText) // Print default text if we have to do it
-                    PrintText(_defaultText, 0);
-                else                                                         // Else print specified button text
-                    PrintText(texts[_buttonIndex], 0);
-
-                // Read user input at the right bottom corner then erase it from the screen to keep a clean window
-                Console.SetCursorPosition(Console.WindowWidth - 2, Console.WindowHeight - 2);
-                input = Console.ReadKey().Key;
-                Console.SetCursorPosition(Console.WindowWidth-2, Console.WindowHeight - 2);
-                Console.Write(' ');
-
-                // Change selected button 
-                if (input == ConsoleKey.LeftArrow) 
-                {
-                    SoundManager.Play("arrow_key.mp3");
-                    _buttonIndex--;
-                }
-                else if (input == ConsoleKey.RightArrow)
-                {
-                    SoundManager.Play("arrow_key.mp3");
-                    _buttonIndex++;
-                }
-
-                // Return to the first button if user press right arrow while being on the last button
-                if (_buttonIndex >= butsText.Length)
-                    _buttonIndex = 0;
-                // Return to the last button if user press left arrow while being on the first button
-                else if (_buttonIndex < 0)
-                    _buttonIndex = butsText.Length - 1;
-
-                #region Beber Easter Egg
-                easterEgg += input;
-                if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
-                    Beber(0);
-                #endregion
-            } while (input != ConsoleKey.Enter && input != ConsoleKey.Spacebar);
-
-            // User press Enter or Space
-            SoundManager.Play("selection.mp3");
-            nextScene = butsText[_buttonIndex];
-            return nextScene;
-        }
-
-        static void StringToGrid(string sprite, int oX, int oY, ConsoleColor color = defaultColor, int eX = int.MaxValue, int eY = int.MaxValue)
-        {
-
-            string[] slice = sprite.Split('\n');
-
-            if (Math.Max(eX, eY) < int.MaxValue)
-            {
-                for (int y = 0; y < slice.Length; y++)
-                {
-
-                    for (int x = 0; x < slice[y].Length; x++)
-                    {
-                        if (x + oX + eX > 0 && y + oY + eY > 0 && x + oX + eX < xMax && y + oY + eY < yMax)
-                        {
-                            _grid[x + oX + eX, y + oY + eY] = ' ';
-                            _colorGrid[x + oX + eX, y + oY + eY] = color;
-                        }
-                    }
-
-                }
-            }
-
-            if (!(eX == 0 && eY == 0))
-            {
-                for (int y = 0; y < slice.Length; y++)
-                {
-                    for (int x = 0; x < slice[y].Length; x++)
-                    {
-                        if ((x + oX > 0 && y + oY > 0 && x + oX < xMax && y + oY < yMax) || sprite == _gridBorders)
-                        {
-                            _grid[x + oX, y + oY] = slice[y][x];
-                            _colorGrid[x + oX, y + oY] = color;
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void ChooseAttack(Character source)
-        {
-            switch(source)
-            {
-                case Damager: BulletAnim(Damager.BulletSprite, source.IsLeft, source.SpriteColorInstance, "fire.mp3"); break;
-                case Healer: BulletAnim(Healer.BulletSprite, source.IsLeft, source.SpriteColorInstance, "spell.mp3"); break;
-                case Tank: TankAttackAnim(source.IsLeft, Tank.SpriteColor); break;
-            }
-        }
-
-        public static void DamagerSpecialAnim(bool lookRight, int dam)
-        {
-            // Le pistolet s'agrandit d'autant de dégats reçus
-            string rageBullet = lookRight ? "=>" : "<=";
-
-            // OU tire autant de balles que de dégâts reçus
-            for (int i = 0; i < dam; i++)
-            {
-                BulletAnim(rageBullet, lookRight, Damager.ColorSpecial, "damager_ulti.mp3");
-                Thread.Sleep(100);
-            }
-        }
-
-        public static void HealerSpecialAnim(bool lookRight)
-        {
-            // Initialisation des données pour l'animation du joueur gauche
-            int startX = charLeft + 6;
-            int s = 1;
-
-            if (!lookRight)
-            {
-                startX = charRight - 1;
-                s = -1;
-            }
-
-            // Créer la bulle et la faire déplacer de 4 sur la droite
-            SoundManager.Play("spell.mp3");
-            for (int i = 0; i < 4; i++)
-            {
-                StringToGrid(Healer.BulletSprite, startX + i * s, 2, Healer.SpriteColor, -Math.Sign(i) * s, 0);
-                PrintGrid();
-                Thread.Sleep(80);
-            }
-            Thread.Sleep(300);
-
-            // Faire apparaître l'éclair qui le transforme en point de vie
-            string[] lightning = ["/", "\\", "/"]; string forErase = " \n \n ";
-            for (int i = 0; i < 3; i++)
-            {
-                StringToGrid(lightning[i], startX + 3 * s, yMax - 2 - i, ConsoleColor.Yellow);
-                PrintGrid();
-                Thread.Sleep(2);
-            }
-            SoundManager.Play("spark.mp3");
-
-            // La bulle se transforme en point de vie 
-            StringToGrid(lifePoint, startX + 3 * s, 2, lifeC);
-            PrintGrid();
-            Thread.Sleep(100);
-
-            // L'éclair disparaît
-            StringToGrid(forErase, startX + 3 * s, 3, defaultColor, 0, 0);
-            PrintGrid();
-            Thread.Sleep(300);
-
-
-            // Les points de vie s'ajoute à notre barre (mov vertical puis horizontal)
-            int getHealth = 2; // Récupérer les points de vie du joueur qui fait le spécial !!
-            int xMov = 11 - getHealth; // Distance horizontale à parcourir
-            if (!lookRight)
-                xMov += 2;
-
-            StringToGrid(lifePoint, startX + 3 * s, 1, lifeC);
-            PrintGrid();
-            Thread.Sleep(80);
-            StringToGrid(lifePoint, startX + 3 * s, 1, lifeC, 0, 1);
-            PrintGrid();
-
-            for (int x = 1; x < xMov; x++)
-            {
-                StringToGrid(lifePoint, startX + (3 - x) * s, 1, lifeC, s, 0);
-                StringToGrid(lifePoint, startX + (4 - x) * s, 1, lifeC, s, 0);
-                PrintGrid();
-                Thread.Sleep(80);
-            }
-            // Mettre à jour les points de vie
-        }
-
-        public static void TankSpecialAnim(bool lookRight, int health)
-        {
-            // Initialisation des données pour l'animation du joueur gauche
-            string spr = Tank.SpriteLeft;
-            int posX = charLeft;
-            int startX = 1 + health;
-            int tarX = charLeft + 4;
-            int s = 1;
-
-            if (!lookRight)
-            {
-                posX = charRight;
-                spr = Tank.SpriteRight;
-                startX = xMax - 1 - health;
-                tarX = charRight + 2;
-                s = -1;
-            }
-
-            // Le dernier point de vie se déplace horizontalement jusqu'au dessus de la tête du tank
-            // Horizontal
-            for (int i = 1; i < Math.Abs(startX - tarX); i++)
-            {
-                StringToGrid(lifePoint, startX + i * s, 1, lifeC, -s, 0);
-                PrintGrid();
-                Thread.Sleep(200);
-            }
-            // Vertical
-            StringToGrid(".", startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC);
-            PrintGrid();
-            Thread.Sleep(100);
-
-            // Le point de vie se consume et offre sa force au tank (animation)
-            string[] trans = ["|", "/", "-", "\\", "+"];
-            SoundManager.Play("spark.mp3");
-            for (int i = 0; i < 15; i++)
-            {
-                StringToGrid(trans[i % trans.Length], startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC);
-                PrintGrid();
-                Thread.Sleep(40);
-            }
-            StringToGrid("|", startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC, 0, 0);
-
-            // Le tank devient rouge et prêt à attaquer
-            StringToGrid(spr, posX, 2, lifeC);
-            PrintGrid();
-            Thread.Sleep(500);
-            TankAttackAnim(lookRight, Tank.SpriteColorSpecial);
-        }
-
-        public static void BulletAnim(string bul, bool lookRight, ConsoleColor color, string sound, int delay = 7)
-        {
-            int startX = charLeft + 7;
-            int tarX = charRight - 1 - bul.Length;
-            int max = Math.Abs(tarX - startX);
-            if (!lookRight)
-            {
-                startX = tarX;
-                tarX = 11;
-            }
-            int s = Math.Sign(tarX - startX);
-
-            SoundManager.Play(sound);
-            for (int x = 0; x <= max; x++)
-            {
-                StringToGrid(bul, startX + x * s, 2, color, -s * Math.Sign(x), 0);
-                PrintGrid();
-                Thread.Sleep(delay);
-            }
-            StringToGrid(bul, startX + max * s, 2, color, 0, 0);
-            DefenseAnim(true, true);
-            PrintGrid();
-        }
-
-        public static void TankAttackAnim(bool lookRight = true, ConsoleColor spriteColor = ConsoleColor.White)
-        {
-            // Par défaut, on rentre les données de l'animation pour le joueur de gauche
-            if (spriteColor == ConsoleColor.White)
-                spriteColor = Tank.SpriteColor;
-
-            string s1 = Tank.SpriteLeftBody; string s2 = Tank.SpriteRightBody; string attack = Tank.SpriteLeftAttack;
-            int startX = charLeft;
-            int tarX = charRight - 7;
-
-            if (!lookRight) // Si finalement on veut faire l'animation pour le joueur de droite, on change les données
-            {
-                s1 = Tank.SpriteRightBody; attack = Tank.SpriteRightAttack; s2 = Tank.SpriteLeftBody;
-                startX = charRight;
-                tarX = charLeft + 7;
-            }
-
-            int max = Math.Abs(tarX - startX);
-            int s = Math.Sign(tarX - startX);
-
-            int sprId = 0;
-            if (lookRight)
-                sprId = -1;
-            else
-                sprId = 4;
-
-            // Le tank s'avance
-            for (int x = 0; x <= max; x++)
-            {
-                if (lookRight)
-                    sprId++;
-                else
-                    sprId--;
-                if (sprId > 3)
-                    sprId = 0;
-                else if (sprId < 0)
-                    sprId = 3;
-                StringToGrid(s1 + Tank.SpriteLegs[sprId % 2], startX + x * s, 2, spriteColor, -s * Math.Sign(x), 0);
-
-                PrintGrid();
-                Thread.Sleep(20);
-            }
-
-            // Le tank donne un coup d'épée
-            SoundManager.Play("hit.mp3");
-            StringToGrid(attack + Tank.SpriteLegs[sprId], tarX, 2, spriteColor);
-            PrintGrid();
-            Thread.Sleep(300);
-
-            s *= -1;
-            // Le tank reprend sa place
-            for (int x = 0; x <= max; x++)
-            {
-                if (lookRight)
-                    sprId--;
-                else
-                    sprId++;
-                if (sprId > 3)
-                    sprId = 0;
-                else if (sprId < 0)
-                    sprId = 3;
-                StringToGrid(s2 + Tank.SpriteLegs[sprId], tarX + x * s, 2, spriteColor, -s * Math.Sign(x), 0);
-
-                PrintGrid();
-                Thread.Sleep(20);
-            }
-            StringToGrid(s1 + Tank.SpriteLegs[0], startX, 2, Tank.SpriteColor);
-            PrintGrid();
-        }
-
-        public static void DefenseAnim(bool isLeft, bool erase = false)
-        {
-            /// <summary>
-            /// Defense shield sprite
-            /// </summary>
-            const string defense = "|\n|\n|\n|";
-
-            int x = 11;
-            if (!isLeft)
-                x = 40;
-
-            if (erase)
-            {
-                StringToGrid(defense, 11, 2, gridTextC, 0, 0);
-                StringToGrid(defense, 40, 2, defaultColor, 0, 0);
-                PrintGrid();
-            }
-            else
-            {
-                SoundManager.Play("defend.mp3");
-                for(int i=4; i >= 0; i--)
-                {
-                    StringToGrid(defense, x, 2-i, defaultColor, 0, -1);
-                    PrintGrid();
-                    Thread.Sleep(200);
-                }
-            }
-        }
-
-        private static void FloorAnim()
-        {
-            /// <summary>
-            /// Floor of the game arena, composed of "===" of grid width length
-            /// </summary>
-            string _floor = new string('=', xMax / 2);
-
-            const ConsoleColor floorC = ConsoleColor.DarkGreen;
-            const int floorTop = yMax - 1;
-
-            for (int i = 0; i <= xMax / 2 + 1; i++)
-            {
-                StringToGrid(_floor, -_floor.Length + i, floorTop, floorC);
-                StringToGrid(_floor, xMax + 1 - i, floorTop, floorC);
-                PrintGrid();
-                Thread.Sleep(2);
-            }
-        }
-
-        public static void Fade(bool intro = true, bool outro = true, int delay = 150) // Animation de transition de scène avec un fondu
-        {
-            /// <summary>
-            /// Middle line (---) of grid width length
-            /// </summary>
-            string _line = new string('-', xMax);
-            ConsoleColor color = ConsoleColor.DarkGray;
-            // Effacer le texte et les boutons
-            Console.SetCursorPosition(0, yMax + 2);
-            for (int i = Console.CursorTop; i < Console.WindowHeight - 1; i++)
-                Console.WriteLine(new string(' ', Console.WindowWidth));
-
-            int max; int min;
-            // Intro
-            if (intro)
-            {
-                max = yMax; min = 0;
-                for (int c = 0; c <= yMax / 2; c++)
-                {
-                    for (int i = 1; i < yMax; i++)
-                    {
-                        if (i <= min || i >= max)
-                            StringToGrid(_line, 1, i, color);
-                    }
-                    min++; max--;
-                    PrintGrid();
-                    Thread.Sleep(delay);
-                }
-                Thread.Sleep(delay * 2);
-            }
-
-            // Outro
-            if (outro)
-            {
-                max = (yMax + 1) / 2; min = max - 1;
-                for (int c = 0; c <= yMax / 2; c++)
-                {
-                    for (int i = 1; i < yMax; i++)
-                    {
-                        if (i <= min || i >= max)
-                        {
-                            StringToGrid(_line, 1, i, color);
-                        }
-                        else
-                        {
-                            StringToGrid(_line, 1, i, color, 0, 0);
-                        }
-                    }
-                    min--; max++;
-                    PrintGrid();
-                    Thread.Sleep(delay);
-                }
-                Thread.Sleep(delay * 2);
-            }
-
-        }
-
+        /// <param name="winner">Winner character</param>
+        /// <param name="loser">Loser character</param>
         public static void DisplayEndGame(Character winner, Character loser) // Sah je pense c'est guez on peut enlever
         {
             SoundManager.StopAllLoops();
-            int w = winner.IsLeft ? 1 : 2;  
+            int w = winner.IsLeft ? 1 : 2;  // Get if Player 1 or 2 wn
 
-            // Le joueur vaincu se retire de l'écran
+            // Loser character vanish animation
             SoundManager.Play("win.mp3");
             string loserSprite = loser.IsLeft ? loser.SpriteLeftInstance : loser.SpriteRightInstance;
+            string winnerSprite = winner.IsLeft ? winner.SpriteLeftInstance : winner.SpriteRightInstance;
             int startX = loser.IsLeft ? charLeft : charRight;
-            for(int i = 0; i <= 10; i++)
+            for (int i = 0; i <= 10; i++)
             {
                 int s = loser.IsLeft ? -1 : 1;
-                StringToGrid(loserSprite, startX + i * s, 2, loser.SpriteColorInstance, -s, 0);
+                SpriteToGrid(loserSprite, startX + i * s, 2, loser.SpriteColorInstance, -s, 0);
                 PrintGrid();
                 Thread.Sleep(50);
             }
@@ -784,182 +358,49 @@ namespace Jeu_de_combat
             string confets1 = $"{c1}\n{c2}\n{c1}\n{c2}\n{c1}\n{c2}";
             string confets2 = $"{c2}\n{c1}\n{c2}\n{c1}\n{c2}\n{c1}";
 
-            // Placer le perso gagant au centre
-            for(int i = yMax; i >= 0; i--)
+            // Center the winner character and tell the user who won
+            for (int i = yMax; i >= 0; i--)
             {
-                StringToGrid(winner.SpriteLeftInstance, charLeft + 17, 2 + i, winner.SpriteColorInstance, 0, 1);
+                SpriteToGrid(winnerSprite, charLeft + 17, 2 + i, winner.SpriteColorInstance, 0, 1);
                 PrintGrid();
                 Thread.Sleep(300);
             }
-
-            // Texte indiquant le gagnant
             PrintText($"{winner.Name} (Player {w}) wins !");
 
-            // Animation des confettis qui arrivent 
+            // Falling confets animation
             SoundManager.Play("win2.mp3", true);
             for (int i = 5; i >= 0; i--)
             {
-                StringToGrid(confets1, 1, 1 - i, ConsoleColor.Yellow, -1, 0);
-                StringToGrid(confets1, xMax - 20, 1 - i, ConsoleColor.Yellow, -1, 0);
+                SpriteToGrid(confets1, 1, 1 - i, ConsoleColor.Yellow, -1, 0);
+                SpriteToGrid(confets1, xMax - 20, 1 - i, ConsoleColor.Yellow, -1, 0);
                 PrintGrid();
                 Thread.Sleep(200);
             }
 
-            // Animation qui fait croire que des confettis tombent en bouclent
+            // Confets loop animation
             for (int i = 0; i < 26; i++)
             {
                 if (i % 2 == 1)
                 {
-                    StringToGrid(confets1, 1, 1, ConsoleColor.Yellow);
-                    StringToGrid(confets1, xMax - 20, 1, ConsoleColor.Yellow);
+                    SpriteToGrid(confets1, 1, 1, ConsoleColor.Yellow);
+                    SpriteToGrid(confets1, xMax - 20, 1, ConsoleColor.Yellow);
                 }
                 else
                 {
-                    StringToGrid(confets2, 1, 1, ConsoleColor.Yellow);
-                    StringToGrid(confets2, xMax - 20, 1, ConsoleColor.Yellow);
+                    SpriteToGrid(confets2, 1, 1, ConsoleColor.Yellow);
+                    SpriteToGrid(confets2, xMax - 20, 1, ConsoleColor.Yellow);
                 }
                 PrintGrid();
                 Thread.Sleep(200);
             }
         }
 
-        public static void UpdateLifePoints(int left, int right)
-        {
-            // Effacer les points de vie actuels
-            StringToGrid(new string(lifePoint[0], xMax/2), 2, 1, lifeC,0,0);
-            StringToGrid(new string(lifePoint[0], xMax/2), xMax/2, 1, lifeC,0,0);
-
-            StringToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
-            StringToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
-            PrintGrid();
-        }
-
-        private static void PrintGrid()
-        {
-            Console.SetCursorPosition(gridLeft, 0);
-            for (int y = 0; y < _grid.GetLength(1); y++)
-            {
-                for (int x = 0; x < _grid.GetLength(0); x++)
-                {
-                    Console.ForegroundColor = _colorGrid[x, y];
-
-                    if (_grid[x, y] == 0)
-                        Console.Write(" ");
-                    else
-                        Console.Write(_grid[x, y]);
-                }
-                Console.SetCursorPosition(10, Console.CursorTop + 1);
-            }
-        }
-
-        private static void PrintButs(string[] butsText)
-        {
-            Console.SetCursorPosition(0, butTop); // Place le curseur à l'endroit assigné pour l'affichage des boutons
-
-            // Définit l'emplacement de chaque bouton
-            List<int> spaces = new List<int>();
-            switch (butsText.Length)
-            {
-                case 1: spaces = [25]; break;
-                case 2: spaces = [16, 34]; break;
-                case 3: spaces = [11, 25, 39]; break;
-                case 4: spaces = [8, 19, 29, 40]; break;
-            }
-
-            // Affiche les boutons et leur texte correspondant
-            for (int i = 0; i < butsText.Count(); i++)
-            {
-                string s = "--";
-                if (i == _buttonIndex)
-                    s = "■■";
-
-                Console.SetCursorPosition(10 + spaces[i], butTop);
-                Console.Write(s);
-                Console.SetCursorPosition(Console.CursorLeft - (butsText[i].Count() - 2) / 2 - 2, Console.CursorTop + 1);
-                Text(butsText[i]);
-            }
-        }
-
-        public static void PrintText(string text, int delay = 10) // Affiche le texte en fonction de la situation
-        {
-            if(text != _actualText) // Efface le texte précédent si il est différent du nouveau
-                ClearScreen(false, false, true);
-
-            Console.SetCursorPosition(0, textTop);
-            Text(text, delay); // Écrit le texte avec un délai d'apparition des caractères pour créer un effet dialogue
-        }
-
-        public static void Text(string text, int delay = 10, bool debug = false)
-        {
-            _actualText = text;
-            if (debug)
-                Console.SetCursorPosition(Console.CursorLeft, Console.WindowTop);
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                if (Console.CursorLeft == 0 && text[i] == ' ') // Si on est au début de la ligne et qu'on doit afficher un espace, on ne le fait pas
-                {
-
-                }
-                else if (Console.CursorLeft == Console.WindowWidth - 1 && i < text.Length - 1) // Si on est au dernier caractère de la ligne de la fenètre mais que ce n'est pas la fin du texte
-                {
-                    if (text[i] == ' ') // Si le dernier caractère à afficher est un espace, on saute directement la ligne
-                        Console.WriteLine();
-                    else if (text[i + 1] != ' ') // Si on est en plein milieu d'un mot, on met un tiret puis on va à la ligne pour afficher le caractère
-                        Console.Write($"-\n{text[i]}");
-                    else // Si on est à la fin d'un mot, on peut donc afficher le dernier caractère et aller à la ligne
-                        Console.WriteLine(text[i]);
-                }
-                else
-                {
-                    Console.Write(text[i]);
-                }
-                Thread.Sleep(delay);
-            }
-        }
-
-        static void ClearInputs() // Permet de supprimer les actions faites par le joueur pendant les animations
-        {
-            while (Console.KeyAvailable)
-            {
-                Console.SetCursorPosition(0, Console.WindowTop);
-                Console.ReadKey();
-                Console.SetCursorPosition(0, Console.CursorTop); 
-                Console.Write(' ');
-            }
-        }
-
-        public static void ClearScreen(bool grid = true, bool buttons = true, bool text = true)
-        {
-            if (grid) 
-            {
-                // Efface toute la grille
-                //Console.SetCursorPosition(0, 0);
-                //for (int i = 0; i < butTop-1; i++)
-                //    Console.WriteLine(new string(' ', Console.WindowWidth
-                //    
-                // Efface l'intérieur de la grille
-                StringToGrid(_gridBorders, 0, 0, defaultColor);
-            }
-            if (buttons)
-            {
-                Console.SetCursorPosition(0, butTop);
-                for (int i = butTop; i < textTop-1; i++)
-                    Console.WriteLine(new string(' ', Console.WindowWidth));
-            }
-            if (text)
-            {
-                Console.SetCursorPosition(0, textTop);
-                for (int i = textTop; i < Console.WindowHeight-1; i++)
-                    Console.WriteLine(new string(' ', Console.WindowWidth));
-            }
-        }
-
+        /// <summary>
+        /// Credits menu
+        /// </summary>
         public static void DisplayCredits()
         {
-            Fade();
-
-            SoundManager.Play("credits.mp3", true);
+            // Data initialization 
             string c = "\"MONOMACHIA\""
                 + "-A P5INJ PRODUCTION"
                 + "-Gameplay Programmer : Adam Adhar"
@@ -971,15 +412,21 @@ namespace Jeu_de_combat
             + "-2024 ©"
             + "---Thanks for playing <3";
             string credits = "";
+
+            // Center each line of the credits
             foreach (string s in c.Split('-'))
             {
                 string space = new string(' ', (xMax - 1 - s.Length) / 2);
                 credits += space + s + space + "\n\n";
             }
 
+            Fade();
+            SoundManager.Play("credits.mp3", true);
+
+            // Scrolls through the credits
             for (int i = 0; i < yMax + credits.Split('\n').Count() - 5; i++)
             {
-                StringToGrid(credits, 1, yMax - i, gridTextC, 0, 1);
+                SpriteToGrid(credits, 1, yMax - i, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(500);
             }
@@ -1013,30 +460,684 @@ namespace Jeu_de_combat
             + "\n |/  \"  \\| "
             + "\n  \\ .-. /  "
             + "\n  /`\"\"\"`\\  ";
-            ConsoleColor[] colors = [ConsoleColor.DarkYellow,ConsoleColor.Red,ConsoleColor.Magenta,ConsoleColor.Green,ConsoleColor.Blue,ConsoleColor.Cyan];
-            ConsoleColor beberC = colors[colorId];
 
-            SoundManager.StopAllLoops();
+            ConsoleColor[] colors = (ConsoleColor[])ConsoleColor.GetValues(typeof(ConsoleColor));
+
+            if (!SoundManager.IsSoundRunning("credits.mp3"))
+                SoundManager.StopAllLoops();
             Fade(true, true);
             SoundManager.Play("credits.mp3", true);
 
             // Beber animation
             for (int y = yMax + 1; y > 0; y--)
             {
-                StringToGrid(beberText, 1, y, gridTextC, 0, 1);
-                StringToGrid(beber, 21, y, beberC, 0, 1);
-                StringToGrid(psinj, 33, y, gridTextC, 0, 1);
+                SpriteToGrid(beberText, 1, y, gridTextC, 0, 1);
+                SpriteToGrid(beber, 21, y, colors[colorId], 0, 1);
+                SpriteToGrid(psinj, 33, y, gridTextC, 0, 1);
                 PrintGrid();
                 Thread.Sleep(300);
             }
-            Thread.Sleep(1000);
 
             if (Selector(["Beber"], ["Beber."]) == "Beber") // Buttons set up
             {
                 Random rand = new Random();
-                Beber(rand.Next(0,colors.Count()));
+                Beber(rand.Next(0, colors.Count()));
             }
         }
+        #endregion
+
+        #region Animations
+        /// <summary>
+        /// Damager's special ability "Rage" animation
+        /// </summary>
+        /// <param name="isLeft">If it's left player or not</param>
+        /// <param name="dam">Received damages</param>
+        public static void DamagerSpecialAnim(bool isLeft, int dam)
+        {
+            string rageBullet = isLeft ? "=>" : "<="; // Create the rage bullet sprite
+
+            // Fire as many times as received damages animation
+            for (int i = 0; i < dam; i++)
+            {
+                BulletAnim(rageBullet, isLeft, Damager.ColorSpecial, "damager_ulti.mp3");
+                Thread.Sleep(100);
+            }
+        }
+
+        /// <summary>
+        /// Healer's special ability "Heal" animation
+        /// </summary>
+        /// <param name="isLeft">If it's left player or not</param>
+        public static void HealerSpecialAnim(bool isLeft)
+        {
+            // Data initialization depending if it's the left or right animation
+            int startX = charLeft + 6;
+            int s = 1;
+            if (!isLeft)
+            {
+                startX = charRight - 1;
+                s = -1;
+            }
+
+            // Create the magic bubble and move it 
+            SoundManager.Play("spell.mp3");
+            for (int i = 0; i < 4; i++)
+            {
+                SpriteToGrid(Healer.BulletSprite, startX + i * s, 2, Healer.SpriteColor, -Math.Sign(i) * s, 0);
+                PrintGrid();
+                Thread.Sleep(80);
+            }
+            Thread.Sleep(300);
+
+            // Lightning appears 
+            string[] lightning = ["/", "\\", "/"]; string forErase = " \n \n ";
+            for (int i = 0; i < 3; i++)
+            {
+                SpriteToGrid(lightning[i], startX + 3 * s, yMax - 2 - i, ConsoleColor.Yellow);
+                PrintGrid();
+                Thread.Sleep(2);
+            }
+            SoundManager.Play("spark.mp3");
+
+            // Magic bubble transforms in life point
+            SpriteToGrid(lifePoint, startX + 3 * s, 2, lifeC);
+            PrintGrid();
+            Thread.Sleep(100);
+
+            // Lightning vanish
+            SpriteToGrid(forErase, startX + 3 * s, 3, defaultColor, 0, 0);
+            PrintGrid();
+            Thread.Sleep(300);
+
+
+            // Life points reach the life bar at the top corner
+            int getHealth = 2; 
+            int xMov = 11 - getHealth;
+            if (!isLeft)
+                xMov += 2;
+
+            SpriteToGrid(lifePoint, startX + 3 * s, 1, lifeC);
+            PrintGrid();
+            Thread.Sleep(80);
+            SpriteToGrid(lifePoint, startX + 3 * s, 1, lifeC, 0, 1);
+            PrintGrid();
+
+            for (int x = 1; x < xMov; x++)
+            {
+                SpriteToGrid(lifePoint, startX + (3 - x) * s, 1, lifeC, s, 0);
+                SpriteToGrid(lifePoint, startX + (4 - x) * s, 1, lifeC, s, 0);
+                PrintGrid();
+                Thread.Sleep(80);
+            }
+        }
+
+        /// <summary>
+        /// Tank's special ability "Strong Attack" animation
+        /// </summary>
+        /// <param name="isLeft">If it's left player or not</param>
+        /// <param name="health">Tank health</param>
+        public static void TankSpecialAnim(bool isLeft, int health)
+        {
+            // Data initialization depending if it's the left or right animation
+            string spr = Tank.SpriteLeft;
+            int posX = charLeft;
+            int startX = 1 + health;
+            int tarX = charLeft + 4;
+            int s = 1;
+
+            if (!isLeft)
+            {
+                posX = charRight;
+                spr = Tank.SpriteRight;
+                startX = xMax - 1 - health;
+                tarX = charRight + 2;
+                s = -1;
+            }
+
+            // The last life point of the life bar move above the Tank head
+            // Horizontal movement
+            for (int i = 1; i < Math.Abs(startX - tarX); i++)
+            {
+                SpriteToGrid(lifePoint, startX + i * s, 1, lifeC, -s, 0);
+                PrintGrid();
+                Thread.Sleep(200);
+            }
+            // Vertical movement
+            SpriteToGrid(".", startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC);
+            PrintGrid();
+            Thread.Sleep(100);
+
+            // Life point metamorphose animation
+            string[] trans = ["|", "/", "-", "\\", "+"];
+            SoundManager.Play("spark.mp3");
+            for (int i = 0; i < 15; i++)
+            {
+                SpriteToGrid(trans[i % trans.Length], startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC);
+                PrintGrid();
+                Thread.Sleep(40);
+            }
+            SpriteToGrid("|", startX + (Math.Abs(startX - tarX) - 1) * s, 1, lifeC, 0, 0);
+
+            // Tank goes red and attack
+            SpriteToGrid(spr, posX, 2, lifeC);
+            PrintGrid();
+            Thread.Sleep(500);
+            TankAttackAnim(isLeft, Tank.SpriteColorSpecial);
+        }
+
+        /// <summary>
+        /// Tank attack animation
+        /// </summary>
+        /// <param name="isLeft">If it's left player or not</param>
+        /// <param name="spriteColor">Tank color during attack</param>
+        public static void TankAttackAnim(bool isLeft = true, ConsoleColor spriteColor = ConsoleColor.White)
+        {
+            // Data initialization depending if it's the left or right animation
+            if (spriteColor == ConsoleColor.White)
+                spriteColor = Tank.SpriteColor;
+
+            string s1 = Tank.SpriteLeftBody; string s2 = Tank.SpriteRightBody; string attack = Tank.SpriteLeftAttack;
+            int startX = charLeft;
+            int tarX = charRight - 7;
+
+            if (!isLeft)
+            {
+                s1 = Tank.SpriteRightBody; attack = Tank.SpriteRightAttack; s2 = Tank.SpriteLeftBody;
+                startX = charRight;
+                tarX = charLeft + 7;
+            }
+
+            int max = Math.Abs(tarX - startX);
+            int s = Math.Sign(tarX - startX);
+
+            int sprId = 0;
+            if (isLeft)
+                sprId = -1;
+            else
+                sprId = 4;
+
+
+            // Tank walk to his opponent
+            for (int x = 0; x <= max; x++)
+            {
+                if (isLeft)
+                    sprId++;
+                else
+                    sprId--;
+                if (sprId > 3)
+                    sprId = 0;
+                else if (sprId < 0)
+                    sprId = 3;
+                SpriteToGrid(s1 + Tank.SpriteLegs[sprId % 2], startX + x * s, 2, spriteColor, -s * Math.Sign(x), 0);
+
+                PrintGrid();
+                Thread.Sleep(20);
+            }
+
+            // Tank hit his opponent with his sword
+            SoundManager.Play("hit.mp3");
+            SpriteToGrid(attack + Tank.SpriteLegs[sprId], tarX, 2, spriteColor);
+            PrintGrid();
+            Thread.Sleep(300);
+
+            // Tank goes back
+            s *= -1;
+            for (int x = 0; x <= max; x++)
+            {
+                if (isLeft)
+                    sprId--;
+                else
+                    sprId++;
+                if (sprId > 3)
+                    sprId = 0;
+                else if (sprId < 0)
+                    sprId = 3;
+                SpriteToGrid(s2 + Tank.SpriteLegs[sprId], tarX + x * s, 2, spriteColor, -s * Math.Sign(x), 0);
+
+                PrintGrid();
+                Thread.Sleep(20);
+            }
+            SpriteToGrid(s1 + Tank.SpriteLegs[0], startX, 2, Tank.SpriteColor);
+            PrintGrid();
+        }
+
+        /// <summary>
+        /// Bullet animation for Healer and Damager attack
+        /// </summary>
+        /// <param name="sprite">Bullet sprite</param>
+        /// <param name="isLeft">If it's left player or not</param>
+        /// <param name="color">Bullet color</param>
+        /// <param name="sound">Bullet fire sound</param>
+        public static void BulletAnim(string sprite, bool isLeft, ConsoleColor color, string sound)
+        {
+            // Data initialization depending if it's the left or right animation
+            int startX = charLeft + 7;
+            int tarX = charRight - 1 - sprite.Length;
+            int max = Math.Abs(tarX - startX);
+            if (!isLeft)
+            {
+                startX = tarX;
+                tarX = 11;
+            }
+            int s = Math.Sign(tarX - startX);
+
+            // Bullet animation
+            SoundManager.Play(sound);
+            for (int x = 0; x <= max; x++)
+            {
+                SpriteToGrid(sprite, startX + x * s, 2, color, -s * Math.Sign(x), 0);
+                PrintGrid();
+                Thread.Sleep(7);
+            }
+            SpriteToGrid(sprite, startX + max * s, 2, color, 0, 0);
+            DefenseAnim(true, true); 
+            PrintGrid();
+        }
+
+        /// <summary>
+        /// Defend action animation
+        /// </summary>
+        /// <param name="isLeft">If it's left player or not</param>
+        /// <param name="erase">If we have to erase or create the defense sprite</param>
+        public static void DefenseAnim(bool isLeft, bool erase = false)
+        {
+            // Data initialization depending if it's the left or right animation
+            const string defense = "|\n|\n|\n|";
+
+            int x = 11;
+            if (!isLeft)
+                x = 40;
+
+            if (erase) // Erase all defenses sprite
+            {
+                SpriteToGrid(defense, 11, 2, gridTextC, 0, 0);
+                SpriteToGrid(defense, 40, 2, defaultColor, 0, 0);
+                PrintGrid();
+            }
+            else // Create the left or right defense sprite
+            {
+                SoundManager.Play("defend.flac");
+                for(int i=4; i >= 0; i--)
+                {
+                    SpriteToGrid(defense, x, 2-i, defaultColor, 0, -1);
+                    PrintGrid();
+                    Thread.Sleep(200);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Floor apparition animation
+        /// </summary>
+        private static void FloorAnim()
+        {
+            // Data
+            string _floor = new string('=', xMax / 2);
+
+            const ConsoleColor floorC = ConsoleColor.DarkGreen;
+            const int floorTop = yMax - 1;
+
+            // Apparition
+            for (int i = 0; i <= xMax / 2 + 1; i++)
+            {
+                SpriteToGrid(_floor, -_floor.Length + i, floorTop, floorC);
+                SpriteToGrid(_floor, xMax + 1 - i, floorTop, floorC);
+                PrintGrid();
+                Thread.Sleep(2);
+            }
+        }
+
+        /// <summary>
+        /// Fade in and out animation
+        /// </summary>
+        /// <param name="intro">If it plays fade in</param>
+        /// <param name="outro">If it plays fade out</param>
+        /// <param name="delay">Time delay between each animation frame</param>
+        public static void Fade(bool intro = true, bool outro = true, int delay = 150) // Animation de transition de scène avec un fondu
+        {
+            // Data
+            string _line = new string('-', xMax);
+            ConsoleColor color = ConsoleColor.DarkGray;
+            int max; int min;
+
+            // Erase buttons and text 
+            Console.SetCursorPosition(0, yMax + 2);
+            for (int i = Console.CursorTop; i < Console.WindowHeight - 1; i++)
+                Console.WriteLine(new string(' ', Console.WindowWidth));
+
+            // Fade in animation
+            if (intro)
+            {
+                max = yMax; min = 0;
+                for (int c = 0; c <= yMax / 2; c++)
+                {
+                    for (int i = 1; i < yMax; i++)
+                    {
+                        if (i <= min || i >= max)
+                            SpriteToGrid(_line, 1, i, color);
+                    }
+                    min++; max--;
+                    PrintGrid();
+                    Thread.Sleep(delay);
+                }
+                Thread.Sleep(delay * 2);
+            }
+
+            // Fade out animation
+            if (outro)
+            {
+                max = (yMax + 1) / 2; min = max - 1;
+                for (int c = 0; c <= yMax / 2; c++)
+                {
+                    for (int i = 1; i < yMax; i++)
+                    {
+                        if (i <= min || i >= max)
+                        {
+                            SpriteToGrid(_line, 1, i, color);
+                        }
+                        else
+                        {
+                            SpriteToGrid(_line, 1, i, color, 0, 0);
+                        }
+                    }
+                    min--; max++;
+                    PrintGrid();
+                    Thread.Sleep(delay);
+                }
+                Thread.Sleep(delay * 2);
+            }
+
+        }
+        #endregion
+        
+        #region Utilitary fonctions
+        /// <summary>
+        /// Button selection display
+        /// </summary>
+        /// <param name="butsText">Buttons name</param>
+        /// <param name="texts">Specified texts with each button</param>
+        /// <returns></returns>
+        public static string Selector(string[] butsText, string[] texts)
+        {
+            _buttonIndex = (int)Math.Ceiling((decimal)butsText.Count() / 2) - 1; // Center preset selected button
+            string easterEgg = ""; // EasterEgg...
+            string nextScene = ""; // User choice
+
+            ConsoleKey input; // User input
+            do
+            {
+                ClearInputs();
+                PrintButs(butsText);
+
+                if (texts[0] == _defaultText)
+                {
+                    if(_actualText != _defaultText) // Print default text if we have to do it
+                        PrintText(_defaultText, 0);
+                }
+                else                                // Else print specified button text
+                    PrintText(texts[_buttonIndex], 0);
+
+                // Read user input at the right bottom corner then erase it from the screen to keep a clean window
+                Console.SetCursorPosition(Console.WindowWidth - 2, Console.WindowHeight - 2);
+                input = Console.ReadKey().Key;
+                Console.SetCursorPosition(Console.WindowWidth-2, Console.WindowHeight - 2);
+                Console.Write(' ');
+
+                // Change selected button 
+                if (input == ConsoleKey.LeftArrow) 
+                {
+                    SoundManager.Play("arrow_key.mp3");
+                    _buttonIndex--;
+                }
+                else if (input == ConsoleKey.RightArrow)
+                {
+                    SoundManager.Play("arrow_key.mp3");
+                    _buttonIndex++;
+                }
+
+                // Return to the first button if user press right arrow while being on the last button
+                if (_buttonIndex >= butsText.Length)
+                    _buttonIndex = 0;
+                // Return to the last button if user press left arrow while being on the first button
+                else if (_buttonIndex < 0)
+                    _buttonIndex = butsText.Length - 1;
+
+                #region Beber Easter Egg
+                string b = input.ToString().ToUpper();
+                if (b=="B"||b=="E"||b=="R"||b=="P"||b=="S"||b=="I"||b=="N"||b=="J")
+                {
+                    SoundManager.Play("selection.mp3");
+                    easterEgg += input;
+                    if (easterEgg.ToUpper().Contains("BEBER") || easterEgg.ToUpper().Contains("PSINJ"))
+                        Beber(6);
+                }
+                #endregion
+            } while (input != ConsoleKey.Enter && input != ConsoleKey.Spacebar && input != ConsoleKey.DownArrow);
+
+            // User press Enter or Space
+            SoundManager.Play("selection.mp3");
+            nextScene = butsText[_buttonIndex];
+            return nextScene;
+        }
+
+        /// <summary>
+        /// Convert a sprite (string) into the game screen (grid)
+        /// </summary>
+        /// <param name="sprite">Sprite to convert</param>
+        /// <param name="oX">X (column) origin position</param>
+        /// <param name="oY">Y (line) origin position</param>
+        /// <param name="color">Sprite color</param>
+        /// <param name="eX">Where to erase sprite from the X origin position</param>
+        /// <param name="eY">Where to erase sprite from the Y origin position</param>
+        static void SpriteToGrid(string sprite, int oX, int oY, ConsoleColor color = defaultColor, int eX = int.MaxValue, int eY = int.MaxValue)
+        {
+            string[] slice = sprite.Split('\n'); // Cut the sprite line by line
+
+            if (Math.Max(eX, eY) < int.MaxValue) // If we have to erase a sprite already printed
+            {
+                // Go throught each char / "pixel" of the sprite
+                for (int y = 0; y < slice.Length; y++) 
+                {
+
+                    for (int x = 0; x < slice[y].Length; x++)
+                    {
+                        // If the char is inside the game screen, erase it by replace it by ' '
+                        if (x + oX + eX > 0 && y + oY + eY > 0 && x + oX + eX < xMax && y + oY + eY < yMax)
+                        {
+                            _grid[x + oX + eX, y + oY + eY] = ' ';
+                            _colorGrid[x + oX + eX, y + oY + eY] = color;
+                        }
+                    }
+
+                }
+            }
+
+            // If we don't want to just erase a sprite (by putting eX=0 and eY=0)
+            if (!(eX == 0 && eY == 0))
+            {
+                // Go throught each char / "pixel" of the sprite
+                for (int y = 0; y < slice.Length; y++)
+                {
+                    for (int x = 0; x < slice[y].Length; x++)
+                    {
+                        // If the char position is inside the game screen
+                        if ((x + oX > 0 && y + oY > 0 && x + oX < xMax && y + oY < yMax) || sprite == _gridBorders)
+                        {
+                            _grid[x + oX, y + oY] = slice[y][x]; // Set the "pixel" for actual position in grid
+                            _colorGrid[x + oX, y + oY] = color; // Set the color for actual position in grid
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Choose which attack animation to play depending on the character
+        /// </summary>
+        /// <param name="source">Attacker character</param>
+        public static void ChooseAttack(Character source)
+        {
+            switch(source)
+            {
+                case Damager: BulletAnim(Damager.BulletSprite, source.IsLeft, source.SpriteColorInstance, "fire.mp3"); break;
+                case Healer: BulletAnim(Healer.BulletSprite, source.IsLeft, source.SpriteColorInstance, "spell.mp3"); break;
+                case Tank: TankAttackAnim(source.IsLeft, Tank.SpriteColor); break;
+            }
+        }
+
+        /// <summary>
+        /// Update the life points on the top corners of the gamescreen
+        /// </summary>
+        /// <param name="left">Life points of the left player (1)</param>
+        /// <param name="right">Life points of the right player (2)</param>
+        public static void UpdateLifePoints(int left, int right)
+        {
+            // Erase actual life points sprites
+            SpriteToGrid(new string(lifePoint[0], xMax / 2), 2, 1, lifeC, 0, 0);
+            SpriteToGrid(new string(lifePoint[0], xMax / 2), xMax / 2, 1, lifeC, 0, 0);
+
+            // Create new sprites of actual life points
+            SpriteToGrid(new string(lifePoint[0], left), 2, 1, lifeC);
+            SpriteToGrid(new string(lifePoint[0], right), xMax - 1 - right, 1, lifeC, 1, 0);
+            PrintGrid();
+        }
+
+        /// <summary>
+        /// Clear the user inputs pressed while an animation
+        /// </summary>
+        static void ClearInputs() 
+        {
+            while (Console.KeyAvailable)
+            {
+                Console.SetCursorPosition(Console.WindowWidth - 2, Console.WindowHeight - 2);
+                Console.ReadKey();
+                Console.SetCursorPosition(Console.WindowWidth - 2, Console.WindowHeight - 2);
+                Console.Write(' ');
+            }
+        }
+        #endregion
+
+        #region Print fonctions
+
+        /// <summary>
+        /// Print the game screen (grid)
+        /// </summary>
+        private static void PrintGrid()
+        {
+            Console.SetCursorPosition(gridLeft, 0); // Set the cursor at the specified position 
+            // Browse each element of the grid and print it with his specified color
+            for (int y = 0; y < _grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < _grid.GetLength(0); x++)
+                {
+                    Console.ForegroundColor = _colorGrid[x, y];
+
+                    if (_grid[x, y] == 0)
+                        Console.Write(" ");
+                    else
+                        Console.Write(_grid[x, y]);
+                }
+                Console.SetCursorPosition(10, Console.CursorTop + 1);
+            }
+        }
+
+        /// <summary>
+        /// Print the buttons 
+        /// </summary>
+        /// <param name="butsText">Buttons name</param>
+        private static void PrintButs(string[] butsText)
+        {
+            Console.SetCursorPosition(0, butTop); // Set cursor at the specified position
+
+            // Define each button position depending on the buttons count
+            List<int> spaces = new List<int>();
+            switch (butsText.Length)
+            {
+                case 1: spaces = [25]; break;
+                case 2: spaces = [16, 34]; break;
+                case 3: spaces = [11, 25, 39]; break;
+                case 4: spaces = [8, 19, 29, 40]; break;
+            }
+
+            // Print each buttons, whose selected one, and its name
+            for (int i = 0; i < butsText.Count(); i++)
+            {
+                string s = "--";
+                if (i == _buttonIndex)
+                    s = "■■";
+
+                Console.SetCursorPosition(10 + spaces[i], butTop); // Button position
+                Console.Write(s);
+                Console.SetCursorPosition(Console.CursorLeft - (butsText[i].Count() - 2) / 2 - 2, Console.CursorTop + 1); // Text below the button centered position
+                Console.Write(butsText[i]);
+            }
+        }
+
+        /// <summary>
+        /// Print actual text
+        /// </summary>
+        /// <param name="text">Text to print</param>
+        /// <param name="delay">Delay to print each letter of the text</param>
+        public static void PrintText(string text, int delay = 10)
+        {
+            if(text != _actualText) // Erase precedent text if it's not the same as the new one
+                ClearScreen(false, false, true);
+
+            Console.SetCursorPosition(0, textTop);
+
+            _actualText = text;
+            for (int i = 0; i < text.Length; i++)
+            {
+                // If we are on the last char of the window's line but it's isn't end of the text
+                if (Console.CursorLeft == Console.WindowWidth - 1 && i < text.Length - 1)
+                {
+                    // If the last char is a space, we line break
+                    if (text[i] == ' ') 
+                        Console.WriteLine();
+                    // Else if we are in the middle of a word, we put a dash then break line to print the char
+                    else if (text[i + 1] != ' ') 
+                        Console.Write($"-\n{text[i]}");
+                    // Else if we are at the last letter of a word, we print it
+                    else
+                        Console.WriteLine(text[i]);
+                }
+                // Else if the char isn't a space to print on the first char of the line, we simply print the char
+                else if(Console.CursorLeft != 0 || text[i] != ' ') 
+                {
+                    Console.Write(text[i]);
+                }
+                Thread.Sleep(delay);
+            }
+        }
+
+        /// <summary>
+        /// Clean the different sections of the application window
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="buttons"></param>
+        /// <param name="text"></param>
+        public static void ClearScreen(bool grid = true, bool buttons = true, bool text = true)
+        {
+            if (grid) // Clean the game screen except the grid borders
+            {
+                SpriteToGrid(_gridBorders, 0, 0, defaultColor);
+                PrintGrid();
+            }
+            if (buttons) // Clean the buttons and their name
+            {
+                Console.SetCursorPosition(0, butTop);
+                for (int i = butTop; i < textTop-1; i++)
+                    Console.WriteLine(new string(' ', Console.WindowWidth));
+            }
+            if (text) // Clean the text
+            {
+                Console.SetCursorPosition(0, textTop);
+                for (int i = textTop; i < Console.WindowHeight-1; i++)
+                    Console.WriteLine(new string(' ', Console.WindowWidth));
+            }
+        }
+
+        #endregion
     }
 }
 
