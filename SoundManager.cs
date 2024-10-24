@@ -3,7 +3,7 @@
 namespace Jeu_de_combat
 {
     /// <summary>
-    /// static class to manage sound and music in game
+    /// Manages sound and music in game.
     /// </summary>
     public static class SoundManager
     {

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Jeu_de_combat
+﻿namespace Jeu_de_combat
 {
     /// <summary>
     /// Defines a Tank character.
@@ -58,9 +56,6 @@ namespace Jeu_de_combat
         }
 
         #region Public API
-
-        /////<inheritdoc cref="Character.IsAlive"/>
-        //public new bool IsAlive => _health > 0 ? true : false;
 
         ///<inheritdoc cref=" _specialEffectEnabled"/>
         public bool SpecialEffectEnabled => _specialEffectEnabled;

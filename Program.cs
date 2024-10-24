@@ -4,9 +4,6 @@ namespace Jeu_de_combat
 {
     internal class Program()
     {
-        ///<inheritdoc cref="GameDisplay"/>
-        //public GameDisplay _displayModule = new GameDisplay();
-
         /// <summary>
         /// Tracks <see cref="AttackProcess"/> datas. 
         /// </summary>

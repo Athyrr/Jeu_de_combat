@@ -53,11 +53,13 @@
 
         #region Public API
 
-        /////<inheritdoc cref="Character.IsAlive"/>
-        //public new bool IsAlive => _health > 0 ? true : false;
-
+        ///<inheritdoc cref="Character.SpriteLeft"/>
         public new static string SpriteLeft => _spriteLeft;
+       
+        ///<inheritdoc cref="Character.SpriteRight"/>
         public new static string SpriteRight => _spriteRight;
+      
+        ///<inheritdoc cref="Character.SpriteColor"/>
         public new static ConsoleColor SpriteColor => _spriteColor;
 
         ///<inheritdoc cref="_bulletSprite"/>

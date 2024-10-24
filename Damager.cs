@@ -67,9 +67,6 @@
 
         #region Public API
 
-        /////<inheritdoc cref="Character.IsAlive"/>
-        //public new bool IsAlive => Health > 0 ? true : false;
-
         ///<inheritdoc cref=_damagesTaken"/>
         public int DamagesTaken => _damagesTaken;
 
