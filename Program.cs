@@ -90,7 +90,7 @@ namespace Jeu_de_combat
                             chooseCharacterId = 1;
                             state = GameState.AISelection;
                         }
-                        else 
+                        else
                             state = GameState.CharacterSelection;
                         break;
 
@@ -104,15 +104,15 @@ namespace Jeu_de_combat
                             "Choose IA character :",
                             "Choose IA character :"
                         };
-                        if (_wantAI && chooseCharacterId==0)
-                            chooseCharacterId=1;
+                        if (_wantAI && chooseCharacterId == 0)
+                            chooseCharacterId = 1;
 
                         characterString = GameDisplay.DisplayCharacterSelection(texts[chooseCharacterId]);
 
-                        if(chooseCharacterId<=1) // Choix du joueur ou pour l'IA
+                        if (chooseCharacterId <= 1) // Choix du joueur ou pour l'IA
                         {
                             _player1 = PlayerSelection(characterString);
-                            _player1.IsIA = chooseCharacterId==1;
+                            _player1.IsIA = chooseCharacterId == 1;
                             _player1.IsLeft = true;
                         }
                         else // Choix pour l'IA
@@ -132,7 +132,7 @@ namespace Jeu_de_combat
                             state = GameState.AISelection;
                             chooseCharacterId = 2;
                         }
-                        else 
+                        else
                             state = GameState.Game;
 
                         break;
@@ -232,7 +232,7 @@ namespace Jeu_de_combat
                 AttackSelection(_player2, _player1);
 
                 GameDisplay.ClearScreen(false);
-                if (difficulty[0]=="Zeus")
+                if (difficulty[0] == "Zeus")
                 {
                     _defendProcesses.Reverse();
                     _attackProcesses.Reverse();
@@ -274,9 +274,9 @@ namespace Jeu_de_combat
 
             // If player defended last turn and so can't defend again
             int id = -1;
-            if(source.previousChoices.Count > 0)
+            if (source.previousChoices.Count > 0)
             {
-                if (source.previousChoices[source.previousChoices.Count()-1] == "Defend")
+                if (source.previousChoices[source.previousChoices.Count() - 1] == "Defend")
                 {
                     choices.Remove("Defend");
                     choicesText.RemoveAt(1);
@@ -428,8 +428,11 @@ namespace Jeu_de_combat
                     GameDisplay.DamagerSpecialAnim(true, receivedDamages);
                     _player1.Attack(_player2, receivedDamages);
                 }
-                GameDisplay.PrintText("Damager (Player 1) special missed !");
-                Thread.Sleep(500);
+                else
+                {
+                    GameDisplay.PrintText("Damager (Player 1) special missed !");
+                    Thread.Sleep(500);
+                }
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -443,8 +446,11 @@ namespace Jeu_de_combat
                     GameDisplay.DamagerSpecialAnim(false, receivedDamages);
                     _player2.Attack(_player1, receivedDamages);
                 }
-                GameDisplay.PrintText("Damager (Player 2) special missed !");
-                Thread.Sleep(500);
+                else
+                {
+                    GameDisplay.PrintText("Damager (Player 2) special missed !");
+                    Thread.Sleep(500);
+                }
 
                 if (EndGame(_player1, _player2))
                     return;
@@ -463,7 +469,7 @@ namespace Jeu_de_combat
             switch (difficulty[which])
             {
                 // AI will do a choice randomly, with a 10% chance doing its special ability.
-                case "Tyche": 
+                case "Tyche":
                     int r = rand.Next(0, 100);
                     if (r < 10 && !source.previousChoices.Contains("Special"))
                         choice = "Special";
@@ -479,7 +485,7 @@ namespace Jeu_de_combat
                     break;
 
                 // AI will do a coherent choice according to his situation (character, life points)
-                case "Athena": 
+                case "Athena":
                     switch (source.CharacterClass)
                     {
                         case CharacterClasses.Damager: // AI is a Damager
@@ -514,7 +520,7 @@ namespace Jeu_de_combat
 
                         case CharacterClasses.Tank: // If AI is a Tank
                             // AI has half a chance to do its special if it has over 2 life points 
-                            if (source.Health > 2 && rand.Next(0,2)==0 && choices.Contains("Special"))
+                            if (source.Health > 2 && rand.Next(0, 2) == 0 && choices.Contains("Special"))
                                 choice = "Special";
 
                             // Else if its life is smaller than 3, it defends
@@ -531,11 +537,11 @@ namespace Jeu_de_combat
 
                 // AI will play before the player while already know his action and so will do the best possible choice
                 case "Zeus":
-                    string playerChoice = target.previousChoices[target.previousChoices.Count-1];
-                    if(playerChoice=="Special")
+                    string playerChoice = target.previousChoices[target.previousChoices.Count - 1];
+                    if (playerChoice == "Special")
                         playerChoice = target.Name;
 
-                    bool canHeal = (source is Healer && source.Health <= source.MaxHealth-2 && choices.Contains("Special"));
+                    bool canHeal = (source is Healer && source.Health <= source.MaxHealth - 2 && choices.Contains("Special"));
                     bool canRage = (source is Damager && choices.Contains("Special"));
                     bool canStrong = (source is Tank && choices.Contains("Special") && source.Health > 1);
 
@@ -551,12 +557,12 @@ namespace Jeu_de_combat
                         case "Defend":
                             if (canHeal)
                                 return "Special";
-                            if (choices.Contains("Defend") && source.Health>target.Strength)
+                            if (choices.Contains("Defend") && source.Health > target.Strength)
                                 return "Defend";
                             break;
 
                         case "Attack":
-                            if(target.Strength>=source.Health) // Attack will kill the AI
+                            if (target.Strength >= source.Health) // Attack will kill the AI
                             {
                                 if (canHeal)
                                     return "Special";
@@ -582,7 +588,7 @@ namespace Jeu_de_combat
                             break;
 
                         case "Tank": // Player is a Tank and use his special
-                            if (target.Strength+1 >= source.Health) // Strong Attack will kill the AI
+                            if (target.Strength + 1 >= source.Health) // Strong Attack will kill the AI
                             {
                                 if (canHeal)
                                     return "Special";
