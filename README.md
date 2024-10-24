@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 ﻿Monomachía
->>>>>>>>>
  
 -> FRANCAIS
 
